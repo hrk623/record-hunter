@@ -1,7 +1,7 @@
 # Record Hunter
 A lightning component bundle for searching records on salesforce platform.
 
-![Record Hunter]()
+![Record Hunter](https://github.com/hrk623/record-hunter/blob/master/images/recordhunter.gif?raw=true)
 
 
 ## What is Record Hunter
@@ -16,6 +16,7 @@ Record Hunter is an unmanaged package which includes demo components for searchi
 This package includes another component specially designed to display the result. This component enables you to;
 - Customize the columns to display on the table.
 - Pick some records from the result and run flows of your choice on them.
+
 
 ## Disclaimer
 This code is only a sample code and has not been fully tested. Please use this code at your own risks.
