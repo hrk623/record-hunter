@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Record Hunter</fullName>
+    <types>
+        <members>Field</members>
+        <members>RecordHunterController</members>
+        <members>RecordHunterLexer</members>
+        <members>RecordHunterTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>RecordHunterEvent</members>
+        <members>RecordHunter_DataTable</members>
+        <members>RecordHunter_SearchBox</members>
+        <name>AuraDefinitionBundle</name>
+    </types>
+    <types>
+        <members>RecordHunterLib</members>
+        <name>StaticResource</name>
+    </types>
+    <version>41.0</version>
+</Package>

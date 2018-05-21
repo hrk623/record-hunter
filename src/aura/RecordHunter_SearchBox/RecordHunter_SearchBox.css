@@ -1,0 +1,86 @@
+.THIS {
+}
+
+.THIS .flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+
+.THIS .flex>div{
+    max-width: 47%;
+}
+.THIS .flex>.slds-form-element{
+    flex: 1;
+}
+.THIS .flex .slds-form-element .slds-form-element__label {
+    width: 200%;
+}
+.THIS .flex .slds-form-element .slds-form-element__control{
+    width: 100%;
+}
+.THIS .flex>.spacer{
+    width: 8px;
+}
+
+.THIS .keyword {
+    display: flex;
+    padding: 0 12px;
+    margin: 18px 0;
+}
+.THIS .keyword-input {
+    flex: 1;
+}
+.THIS .keyword-filterControl {
+    margin-right: 4px;
+}
+.THIS .keyword-filterControl .slds-button {
+    margin-left: 0;
+}
+.THIS .keyword-button {
+    margin-left: 4px;
+}
+.THIS .condition {
+    opacity: 1;
+    animation-duration: .5s;
+    animation-name: fade-in;
+}
+
+.THIS .condition-button {
+    text-align: center;
+    margin-top: 16px;
+}
+
+
+
+
+.THIS .lightningInput.is-labelHidden {
+    flex: 1;
+}
+.THIS .lightningInput.is-labelHidden label {
+    display: none;
+}
+.THIS .lightningInput.is-labelHidden .slds-form-element__control {
+    width:100%;
+}
+
+.THIS .is-hidden{
+    display: none;
+}
+@keyframes fade-in {
+    0% {
+        display: none;
+        opacity: 0;
+    }
+    
+    1% {
+        display: block;
+        opacity: 0;
+    }
+    
+    100% {
+        display: block;
+        opacity: 1;
+    }
+}

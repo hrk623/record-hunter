@@ -1,0 +1,29 @@
+.THIS {
+}
+
+.THIS .is-hidden{
+    display: none;
+}
+
+.THIS .slds-modal article {
+    background: white;
+    border-radius: 5px;
+    overflow: hidden;
+    padding: 16px;
+}
+
+.THIS .message {
+    text-align: center;
+    margin: 12px;
+    position: relative;
+}
+
+.THIS .message .slds-icon {
+    fill: rgba(194, 233, 255,.4);
+}
+
+.THIS .message .message-body {
+    position: absolute;
+    top: 16px;
+    width: 100%;
+}

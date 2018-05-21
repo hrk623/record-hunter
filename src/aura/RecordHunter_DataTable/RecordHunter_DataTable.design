@@ -1,0 +1,11 @@
+<design:component label="RHT - Data Table">
+    <design:attribute name="title"      label="Title"           required="false" default="Result" description="Title displayed on the component header. A number of records displayed follows."/>
+    <design:attribute name="objectName" label="Taget Object"    required="true" default="Opportunity" description="API name for a target object. Add '__c' for a custom object. i.e. Account, Opportunity, CustomObject__c, etc"/>
+    <design:attribute name="fieldNames" label="Column Fields"   required="true" default="Name, Type, StageName, Amount, CloseDate, AccountId.Name, OwnerId:User.Name" description="API names for fields on Target Object. Use ',' for multiple fields. Add '__c' for a custom fields. Use '.' to access its parent object's fields. Use ':' if polymorphic fields. i.e. Name, Amount, CloseDate, AccountId.Name, OwnerId:User.Name"/>
+    <design:attribute name="true"       label="Label for True"  required="true" default="true" description="Label for chechbox value if 'true'"/>
+    <design:attribute name="false"      label="Label for False" required="true" default="false" description="Label for chechbox value if 'false'"/>
+    <design:attribute name="flowNames"  label="Flow Names"      required="false" description="API Name of Flows available for selected records. Flows require an input variable 'contextId' and a collection variable 'selectedIds'. Use ','' for multiple flows."/>
+    <design:attribute name="flowLabels" label="Flow Labels"     required="false" description="Labels for Flows to overwrite the Flows' API Names. Use ','' for multiple flows."/>
+    <design:attribute name="messageWhenNoResult" label="Message When No Result Found" required="false" default="No Records Found" description="Message to display when no records are found"/>
+    
+</design:component>

@@ -1,0 +1,129 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="RecordHunterController" >
+
+    <!-- External Libraries -->
+    <ltng:require scripts="{!$Resource.RecordHunterLib + '/asset/js/moment.js'}" afterScriptsLoaded="{!c.onAfterScriptsLoaded}" />
+    
+    <!-- Global Attributes -->
+    <aura:attribute name="title"                        type="String"  access="global" />
+    <aura:attribute name="objectName"                   type="String"  access="global" />
+    <aura:attribute name="searchBy"                     type="String"  access="global" />
+    <aura:attribute name="searchButtonLabel"            type="String"  access="global" />
+    <aura:attribute name="fieldNames"                   type="String"  access="global" />
+    <aura:attribute name="numColums"                    type="String"  access="global" />
+    <aura:attribute name="isCheckboxIgnoredIfUnchecked" type="Boolean" access="global" default="true" />
+    <aura:attribute name="isObjectNameDisplayed"        type="Boolean" access="global" />
+    <aura:attribute name="isFieldIndexDisplayed"        type="Boolean" access="global" />
+    <aura:attribute name="isConditionFolded"            type="Boolean" access="global" />
+    <aura:attribute name="customLogic"                  type="String"  access="global" default=""/>
+    <aura:attribute name="sectionHeaders"               type="String"  access="global" default=""/>
+    <aura:attribute name="fieldNamesOrDefaultValues"    type="String"  access="global" default=""/>
+    <aura:attribute name="resultTarget"                 type="String"  access="global" />
+    
+    <!-- Public Attributes -->
+    <aura:attribute name="keyword"  type="String" access="public" default=''/>
+    <aura:attribute name="recordId" type="String" access="public" />
+    
+    <!-- Private Attributes -->
+    <aura:attribute name="fields"             type="Object[]" access="private" default="[]" />
+    <aura:attribute name="isKeywordEnabled"   type="Boolean"  access="private" />
+    <aura:attribute name="isConditionEnabled" type="Boolean"  access="private" />
+    <aura:attribute name="numGroupItems"      type="Integer"  access="private" default="6"/>
+    
+    <!-- Event Handlers -->
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+
+    <!-- Event Register -->
+    <aura:registerEvent name="appEvent" type="c:RecordHunterEvent"/>
+    
+    <!-- User Interface -->
+    <div aura:id="component">
+        <lightning:card >
+            
+            <!-- Card Title -->
+            <aura:set attribute="title">
+                <aura:if isTrue="{!!empty(v.title)}">
+                    <lightning:icon iconName="standard:search" size="small" />　{!v.title}
+                </aura:if>
+            </aura:set>
+            <!-- /Card Title -->
+            
+            <!-- Keyword Input Section -->
+           <div class="{!'keyword' + if(v.isKeywordEnabled, '', ' is-hidden')}">
+                <div class="{!'keyword-filterControl' + if(v.isConditionEnabled, '', ' is-hidden')}">
+                    <lightning:buttonIcon class="{!if(v.isConditionFolded, '', ' is-hidden')}" iconName="utility:jump_to_bottom" variant="border-filled" onclick="{!c.onFilterControlButtonClicked}" alternativeText="Show filtering options" />
+                    <lightning:buttonIcon class="{!if(v.isConditionFolded, ' is-hidden', '')}" iconName="utility:jump_to_top" variant="border-filled" onclick="{! c.onFilterControlButtonClicked}" alternativeText="Hide filtering options" />
+                </div>
+                <lightning:input class="is-labelHidden" type="search" variant="label-hidden" name="keyword" value="{!v.keyword}" />
+                <div class="{!'keyword-button'}">
+                   <lightning:button variant="brand" label="{!v.searchButtonLabel}" onclick="{!c.onSearch}" />
+                </div>
+            </div>
+            <!-- /Keyword Input Section -->
+            
+            <!-- Condition Input Section -->
+            <div class="{!'condition' + if(or(!v.isConditionEnabled, and(v.isKeywordEnabled, v.isConditionFolded)), ' is-hidden', '')}">
+                <lightning:layout multipleRows="true" >
+                    <aura:iteration items="{!v.fields}" var="field" indexVar="index" >
+                        
+                        <!-- Section Header -->
+                        <aura:if isTrue="{!and(index%v.numGroupItems==0, !empty(field.header))}">
+                            <lightning:layoutItem size="12" padding="around-small" >
+                                <div class="slds-text-heading_small slds-m-top_small">{!field.header}</div>
+                            </lightning:layoutItem>
+                        </aura:if> 
+                        <!-- /Section Header -->
+                        
+                        <aura:if isTrue="{!!empty(field.type)}">
+                            <lightning:layoutItem size="{!div(12, v.numColums)}" padding="horizontal-small" class="slds-m-bottom_small">
+                                <aura:if isTrue="{!field.type=='STRING' || field.type=='EMAIL' || field.type=='URL' || field.type=='PHONE' || field.type=='ID' || and(field.type=='TEXTAREA', field.isFilterable)}">
+                                    <lightning:input type="text" label="{!if(v.isFieldIndexDisplayed, (index + 1) + '.', '') + field.label + if(v.isObjectNameDisplayed, ' - ' + field.objectLabel, '')}" name="{!field.name}" value="{!field.value}" />
+                                </aura:if> 
+                                <aura:if isTrue="{!field.type=='INTEGER' || field.type=='PERCENT' || field.type=='CURRENCY' || field.type=='DOUBLE'}">
+                                    <div class="flex">
+                                        <lightning:input type="number" label="{!if(v.isFieldIndexDisplayed, (index + 1) + '.', '') + field.label + if(v.isObjectNameDisplayed, ' - ' + field.objectLabel, '')}" name="{!field.name}" value="{!field.minValue}" step="any" placeholder="min"/>
+                                        <lightning:input type="number" label="{!if(v.isFieldIndexDisplayed, (index + 1) + '.', '') + field.label + if(v.isObjectNameDisplayed, ' - ' + field.objectLabel, '')}" name="{!field.name}" value="{!field.maxValue}" step="any" placeholder="max" variant="label-hidden" />
+                                    </div>
+                                </aura:if>
+                                <aura:if isTrue="{!field.type=='PICKLIST' || field.type=='MULTIPICKLIST'}">
+                                    <lightning:select name="{!field.name}" label="{!if(v.isFieldIndexDisplayed, (index + 1) + '.', '') + field.label + if(v.isObjectNameDisplayed, ' - ' + field.objectLabel, '')}" value="{!field.value}">
+                                        <option value="">-</option>
+                                        <aura:iteration items="{!field.options}" var="option">
+                                            <option value="{!option.value}" selected="{!option.isSelected}" text="{!option.label}"/>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </aura:if>
+                                <aura:if isTrue="{!field.type=='BOOLEAN'}">
+                                    <lightning:input type="checkbox" label="{!field.label + if(v.isObjectNameDisplayed, ' - ' + field.objectLabel, '')}" name="{!field.name}" checked="{!field.value}"/>
+                                </aura:if>
+                                <aura:if isTrue="{!field.type=='DATE'}">
+                                    <div class="flex">
+                                        <lightning:input type="date" label="{!if(v.isFieldIndexDisplayed, (index + 1) + '.', '') + field.label + if(v.isObjectNameDisplayed, ' - ' + field.objectLabel, '')}" name="{!field.name}" value="{!field.minValue}" />
+                                        <lightning:input type="date" label="{!if(v.isFieldIndexDisplayed, (index + 1) + '.', '') + field.label + if(v.isObjectNameDisplayed, ' - ' + field.objectLabel, '')}" name="{!field.name}" value="{!field.maxValue}" variant="label-hidden" />
+                                    </div>
+                                </aura:if>
+                                <aura:if isTrue="{!field.type=='DATETIME'}">
+                                    <div class="flex">
+                                        <lightning:input type="datetime-local" label="{!if(v.isFieldIndexDisplayed, (index + 1) + '.', '') + field.label + if(v.isObjectNameDisplayed, ' - ' + field.objectLabel, '')}" name="{!field.name}" value="{!field.minValue}" />
+                                        <lightning:input type="datetime-local" label="{!if(v.isFieldIndexDisplayed, (index + 1) + '.', '') + field.label + if(v.isObjectNameDisplayed, ' - ' + field.objectLabel, '')}" name="{!field.name}" value="{!field.maxValue}" variant="label-hidden" />
+                                    </div>
+                                </aura:if>
+                                <aura:if isTrue="{!field.type=='ADDRESS' || and(field.type=='TEXTAREA', !field.isFilterable) || field.type=='TIME'}">    
+                                    <ui:message title="UNSUPPORTED FIELD TYPE" severity="warning" closable="false"></ui:message>
+                                </aura:if>
+                            </lightning:layoutItem>
+                        </aura:if> 
+                    </aura:iteration>
+                </lightning:layout>
+                <div class="{!'condition-button' + if(!v.isKeywordEnabled, '', ' is-hidden')}">
+                    <lightning:button variant="brand" label="{!v.searchButtonLabel}" onclick="{!c.onSearch}" />
+                </div>
+            </div>
+            <!-- Default Search Result Output -->
+            {!v.body}
+            <!-- /Default Search Result Output -->
+        </lightning:card>
+        <!-- Condition Input Section -->
+        
+        <lightning:spinner aura:id="spinner" class="slds-hide" variant="brand" size="large"/>
+    </div>
+</aura:component>
