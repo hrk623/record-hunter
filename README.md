@@ -20,3 +20,4 @@ This package includes another component specially designed to display the result
 
 ## Disclaimer
 This code is only a sample code and has not been fully tested. Please use this code at your own risks.
+This software is released under the MIT License, see LICENSE.txt.
