@@ -8,29 +8,6 @@ public class RecordHunterController {
             this.hasError = true;
         }
     } 
-     @AuraEnabled 
-    public static Object executeQuickAction(String quickActionName, String contextIds) {
-        try {
-            List<String> messageList = new List<String>();
-            List<String> contextIdList = contextIds.split(',');
-            
-            for(String contextId : contextIdList) {
-                QuickAction.QuickActionRequest req = new QuickAction.QuickActionRequest();
-                req.quickActionName = quickActionName;   
-                req.contextId = contextId;
-                QuickAction.QuickActionResult res = QuickAction.performQuickAction(req);
-                if (res.isSuccess()) {
-                    messageList.add(res.getSuccessMessage());                    
-                } else {
-                    throw new RecordHunterControllerException(res.getErrors()[0].getMessage());
-                }
-            }
-                                   
-            return messageList;
-        } catch (Exception e) {
-            return new Error(e.getMessage() + '(CustomizableSearchController.executeQuickAction)');
-        }
-    }    
     @AuraEnabled 
     public static Object getRecords(String objectName, String fieldsJson, String recordIdsJson) {
         try {
