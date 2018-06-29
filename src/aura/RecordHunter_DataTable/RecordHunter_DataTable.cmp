@@ -1,4 +1,4 @@
-<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="RecordHunterController">
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="RecordHunterController">
 
     <!-- Public Attributes -->
     <aura:attribute name="title"               type="String"           access="public" />
@@ -12,6 +12,9 @@
     <aura:attribute name="false"               type="String"           access="public" default="false" /> 
     <aura:attribute name="messageWhenNoResult" type="String"           access="public" /> 
     <aura:attribute name="modalBody"           type="Aura.Component[]" access="public" />
+    <aura:attribute name="pageSize"            type="Integer"          access="public" default="50" />
+    <aura:attribute name="height"              type="Integer"          access="public" default="500" />
+    <aura:attribute name="errorMessage"        type="String"  access="public" default=""/>  
     
     <!-- Private Attributes -->
     <aura:attribute name="fields"          type="Object[]" access="public" default="[]" />
@@ -20,6 +23,9 @@
     <aura:attribute name="sortedDirection" type="String"   access="private" />
     <aura:attribute name="sortedBy"        type="String"   access="private" />
     <aura:attribute name="flows"           type="Object[]" access="private" default="[]"/>
+    <aura:attribute name="offset"          type="Integer" access="private" default="0"/>
+
+    
     
     <!-- Event Handler -->   
     <aura:handler name="change"  value="{!v.recordIds}" action="{!c.onRecordIdsChanged}"  />
@@ -28,6 +34,7 @@
     
     <!-- User Interface -->   
     <div aura:id="component">
+         
         <lightning:card >
             
             <!-- Card Header -->
@@ -50,15 +57,23 @@
             </aura:set>
             <!-- /Card Actions -->            
 
-             <!-- Data Table -->
-            <lightning:datatable aura:id="dataTable" data="{!v.data}" columns="{!v.columns}" keyField="{!v.objectName + '.Id'}" hideCheckboxColumn="{!empty(v.flows)}"
-                                 sortedBy="{!v.sortedBy}" sortedDirection="{!v.sortedDirection}" onsort="{!c.onSort}"
-                                 onrowaction="{!c.onRowAction}"/>
+            <aura:if isTrue="{!!empty(v.errorMessage)}">
+                <ui:message title="Error" severity="error" closable="false">{!v.errorMessage}</ui:message>
+            </aura:if> 
+            
+            <!-- Data Table -->
+            <div style="{!'height:' + v.height + 'px;'}">
+                <lightning:datatable aura:id="dataTable" data="{!v.data}" columns="{!v.columns}" keyField="{!v.objectName + '.Id'}" hideCheckboxColumn="{!empty(v.flows)}"
+                                     sortedBy="{!v.sortedBy}" sortedDirection="{!v.sortedDirection}" onsort="{!c.onSort}"
+                                     onrowaction="{!c.onRowAction}"
+                                     enableInfiniteLoading="true" onloadmore="{!c.onLoadMoreData}"
+                                     showRowNumberColumn="true" />
+            </div>
             <!-- /Data Table  -->
             
             <!-- Empty Message -->
             <aura:if isTrue="{!and(empty(v.recordIds), !empty(v.messageWhenNoResult))}">
-                <div class="message">
+                <div class="message" >
                     <lightning:icon iconName="utility:warning" size="large" alternativeText="No Record Found"/>
                     <div class="slds-text-body_regular  message-body">{!v.messageWhenNoResult}</div>
                 </div>
@@ -66,7 +81,6 @@
             <!-- /Empty Message -->
             
         </lightning:card>
-        <lightning:spinner aura:id="spinner" class="slds-hide" variant="brand" size="large" />
         
         <!-- Modal Section -->
         <div class="{!if(empty(v.modalBody), 'is-hidden', '')}">

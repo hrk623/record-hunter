@@ -10,9 +10,9 @@ public class RecordHunterTest {
         RecordHunterLexer.testskipper();
         Test.stopTest();
     }
-    static testMethod void runFieldTestSkipper() {
+    static testMethod void runRecordHunterFieldTestSkipper() {
         Test.startTest();
-        Field.testskipper();
+        RecordHunterField.testskipper();
         Test.stopTest();
     }
 }

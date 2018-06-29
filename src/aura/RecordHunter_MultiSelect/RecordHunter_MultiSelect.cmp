@@ -1,0 +1,58 @@
+<aura:component implements="force:hasRecordId">
+    
+    <!-- Public Attributes -->
+    <aura:attribute name="id"          type="String" access="public" required="true" default=""/>
+    <aura:attribute name="name"        type="String" access="public" required="true" default=""/>
+    <aura:attribute name="label"       type="String" access="public" required="true" default=""/>
+    <aura:attribute name="options"     type="Object" access="public" />
+    <aura:attribute name="values"      type="String" access="public" default=""/>
+    <aura:attribute name="variant"     type="String" access="public" />
+    <aura:attribute name="placeholder" type="String" access="public" default="Select an Option"/>
+    
+    <!-- Private Attributes -->
+    <aura:attribute name="showOptions"     type="Boolean" access="private" default="false" />
+    <aura:attribute name="labels"          type="String"  access="private" />
+    
+    <!-- Component Event Handlers -->
+    <aura:handler name="init"   value="{!this}"     action="{!c.onInit}"    />
+    
+    <!-- User Interface -->
+    <div aura:id="{!v.id}" id ="{!v.id}" class="component">
+        <div class="slds-form-element">
+            <aura:if isTrue="{!v.variant != 'label-hidden'}">
+                <label class="slds-form-element__label">{!v.label}</label>
+            </aura:if>
+            <div class="slds-form-element__control">
+                <div class="slds-combobox_container">
+                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" onclick="{!c.onComboboxClicked}">
+                            <input type="text" class="{!'slds-input slds-combobox__input slds-combobox__input-value' + if(v.showOptions, 'slds-has-focus', '')}" autoComplete="off" placeholder="{!v.placeholder}" readonly="" value="{!v.labels}"/>
+                            <span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right">
+                                <lightning:icon iconName="utility:down" alternativeText="down" size="x-small"/>
+                            </span>
+                        </div>
+                        <aura:if isTrue="{!v.showOptions}">
+                            <div class="slds-dropdown slds-dropdown_fluid slds-dropdown_length-5">
+                                <ul class="slds-listbox slds-listbox_vertical">
+
+                                    <aura:iteration items="{!v.options}" var="option" indexVar="index">
+                                        <li class="slds-listbox__item" data-value="{!option.value}" onclick="{!c.onOptionClicked}">
+                                            <div id="option2" class="{!'slds-media slds-listbox__option slds-listbox__option_plain slds-media_small' + if(option.selected, ' slds-is-selected', '')}">
+                                                <span class="slds-media__figure">
+                                                    <lightning:icon iconName="utility:check" alternativeText="check" size="x-small" class="slds-listbox__icon-selected"/>
+                                                </span>
+                                                <span class="slds-media__body">
+                                                    <span class="slds-truncate" title="{!option.label}">{!option.label}</span>
+                                                </span>
+                                            </div>
+                                        </li>
+                                    </aura:iteration>
+                                </ul>
+                            </div>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

@@ -1,5 +1,5 @@
 public class RecordHunterLexer {
- public class RecordHunterLexerException extends Exception {}
+    public class RecordHunterLexerException extends Exception {}
     public Enum Kind { WHITESPACE, NUM, LPAREN, RPAREN, LOGICALAND, LOGICALOR, ZERO }
     public class Token {
         public Kind kind;     
@@ -15,7 +15,7 @@ public class RecordHunterLexer {
         
         DFA dfa = new DFA();
         dfa.reset();
-
+        
         Integer lexemeBeginIndex = 0, curIndex = 0, lastAcceptedIndex = 0;
         String c = ' ';
         Kind lastAcceptedKind = null;
@@ -33,7 +33,7 @@ public class RecordHunterLexer {
                     Token t = new Token(lastAcceptedKind, lexeme);
                     tokens.add(t);
                 } else if (eof) {
-                    if (curIndex > lexemeBeginIndex) throw new RecordHunterLexerException('CustomLogicLexer is throwing an error while reading \'' + input.substring(lexemeBeginIndex) + '\'');
+                    if (curIndex > lexemeBeginIndex) throw new RecordHunterLexerException('RecordHunterLexer.tokenize : CustomLogicLexer is throwing an error while reading \'' + input.substring(lexemeBeginIndex) + '\'');
                     break;
                 }
                 curIndex = lexemeBeginIndex = ++lastAcceptedIndex;
@@ -44,10 +44,10 @@ public class RecordHunterLexer {
         }
         return tokens;
     }
-
-/*
- * DFA
- */
+    
+    /*
+* DFA
+*/
     private class Transition {
         State fromState;
         String chars;
@@ -73,7 +73,7 @@ public class RecordHunterLexer {
             this.stateKindMap.put(State.RPAREN,     Kind.RPAREN); 
             this.stateKindMap.put(State.LOGICALAND, Kind.LOGICALAND); 
             this.stateKindMap.put(State.LOGICALOR,  Kind.LOGICALOR); 
-
+            
             this.table = new List<Transition>();
             this.table.add(new Transition(State.START, ' \t\n',      State.WHITESPACE));
             this.table.add(new Transition(State.START, '0',          State.ZERO));
@@ -105,7 +105,7 @@ public class RecordHunterLexer {
     
     public static void testSkipper() {
         Integer i = 0;
-                i++;
+        i++;
         i--;
         i++;
         i--;

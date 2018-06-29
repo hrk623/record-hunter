@@ -1,4 +1,5 @@
 ({
+
     fireAppEvent  : function(c, h, eventDef, evntAttributes) {
         var appEvent = $A.get(eventDef);
         appEvent.setParams(evntAttributes);
@@ -80,13 +81,19 @@
        const spinner = c.find("spinner");
        $A.util.addClass(spinner, "slds-hide");
     },
-    showErrorToast : function(c, h, message) {
-        var toastEvent = $A.get("e.force:showToast");
-        toastEvent.setParams({
-            type: 'error',
-            mode : 'sticky',
-            message: c.get('v.title') + ': ' + message,
-        });
-        toastEvent.fire();
+    showError : function(c, h, message) {
+        const isOnAppBuilder = document.location.href.toLowerCase().indexOf('flexipageeditor') >= 0;
+        if (isOnAppBuilder) {
+            console.error(message);
+            c.set('v.errorMessage', message);
+        } else {    
+            const toastEvent = $A.get("e.force:showToast");
+            toastEvent.setParams({
+                type: 'error',
+                mode : 'sticky',
+                message: c.get('v.title') + ': ' + message,
+            });
+            toastEvent.fire();
+        }
     }
 })

@@ -12,10 +12,16 @@
     padding: 16px;
 }
 
-.THIS .message {
-    text-align: center;
-    margin: 12px;
+.THIS .slds-card__body {
     position: relative;
+}
+.THIS .message {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    text-align: center;
 }
 
 .THIS .message .slds-icon {
@@ -26,4 +32,8 @@
     position: absolute;
     top: 16px;
     width: 100%;
+}
+
+.THIS .slds-scrollable_y {
+    min-height: 100%;
 }

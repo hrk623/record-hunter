@@ -4,21 +4,19 @@
         h.initColumns(c, h);
     },
     onRecordHunterEvent : function(c, e, h) {
-         c.set("v.recordIds", e.getParam('recordIds'));
+        c.set("v.recordIds", e.getParam('recordIds'));
     },
     onRecordIdsChanged : function(c, e, h) {
-        h.showSpinner(c, h);
-        h.getRecords(c, h, c.get('v.objectName'), JSON.stringify(c.get('v.fields')), JSON.stringify(c.get('v.recordIds')))
-        .then($A.getCallback(function(records) {
-            h.hideSpinner(c, h);
-            h.initData(c, h, records);
-        }))
-        .catch(function(reason) {
-            h.hideSpinner(c, h);
-            h.showErrorToast(c, h, reason + '(controller.onRecordIdsChanged)');
-        });   
+        c.set('v.data', []);
+        c.find("dataTable").set("v.enableInfiniteLoading", true);
+        c.set("v.offset", 0);
+
+        h.loadData(c, h);
     },
-    onSort: function (c, e, h) {
+    onLoadMoreData : function (c, e, h) {
+        h.loadData(c, h); 
+    },
+        onSort: function (c, e, h) {
         const fieldName = e.getParam('fieldName');
         const sortDirection = e.getParam('sortDirection');
         c.set("v.sortedBy", fieldName);
@@ -40,7 +38,7 @@
     onRowAction : function (c, e, h) {
         const action = e.getParam('action');
         const row = e.getParam('row');
-        const recordId = row[e.getParam('action').name + '.Id'];
+        const recordId = row[e.getParam('action').name + '.id'];
         h.navigateToSObject(c, h, recordId);
     },
     onFlowSelected : function (c, e, h) {
@@ -62,7 +60,7 @@
             }]);
         }))
         .catch(function(reason) {
-            h.showErrorToast(c, h, reason + '(controller.onFlowSelected)');
+            h.showError(c, h, "controller.onFlowSelected : " + reason);
         });   
     },
     onFlowStatusChanged : function (c, e, h) {
