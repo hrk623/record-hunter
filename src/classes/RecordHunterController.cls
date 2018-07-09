@@ -69,7 +69,7 @@ public class RecordHunterController {
         try {
             
             // Find records by keyword
-            String findRecordsByKeywordQuery = 'FIND \'' + keyword + '\' IN ALL FIELDS RETURNING ' + objectName + ' (id)';
+            String findRecordsByKeywordQuery = 'FIND \'' + keyword + '\' IN ALL FIELDS RETURNING ' + objectName + ' (Id ORDER BY Id)';
             List<Id> findRecordsByKeywordResult = String.isNotEmpty(keyword) ? new list<Id>(new Map<Id, SObject>(search.query(findRecordsByKeywordQuery)[0]).keySet()) : new List<Id>();
             
             // Deserialize Fields
