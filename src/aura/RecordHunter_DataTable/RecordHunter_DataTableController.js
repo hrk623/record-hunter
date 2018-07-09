@@ -43,7 +43,7 @@
     },
     onFlowSelected : function (c, e, h) {
         const selectedIds = c.find('dataTable').getSelectedRows().reduce(function(prev, row) {
-            prev.push(row[c.get('v.objectName') + '.Id' ]);
+            prev.push(row[c.get('v.objectName').toLowerCase() + '.id' ]);
             return prev;
         }, []); 
         h.initFlowComponent(c, h)
