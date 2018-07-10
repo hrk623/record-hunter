@@ -107,7 +107,7 @@
                     field.options.forEach(function(option) {
                         if (option.value === value) {
                             option.isSelected = true;
-                            element.value = value;
+                            field.value = value;
                         }
                     }); 
                 } else {
