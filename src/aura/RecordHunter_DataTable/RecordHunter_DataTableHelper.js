@@ -28,7 +28,7 @@
             // 2. invalidate Fields which are not supported by this component
             fields = fields.reduce(function(prev, field) {
                 if (!field) {
-                } if (field.type === "ADDRESS" || field.type === "COMBOBOX" || field.type === "REFERENCE" || field.type === "ANYTYPE" 
+                } if (field.type === "ADDRESS" || field.type === "REFERENCE" || field.type === "ANYTYPE" 
                            || field.type === "BASE64" || field.type === "DATACATEGORYGROUPREFERENCE" || field.type === "ENCRYPTEDSTRING") {
                     h.showError(c, h, `The type '${field.type}' for '${field.name}' of '${field.objectName}' is unsupported.`);
                 } else {
