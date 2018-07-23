@@ -171,7 +171,7 @@ public class RecordHunterField {
         List<Schema.PicklistEntry> picklistEntries = Schema.getGlobalDescribe().get(objectName).getDescribe().fields.getMap().get(fieldName).getDescribe().getPicklistValues();
         List<SelectOption> options = new List<SelectOption>();
         for(Schema.PicklistEntry e : picklistEntries){
-            options.add(new SelectOption(e.getValue(), e.getLabel()));
+            options.add(new SelectOption(e.getLabel(), e.getValue()));
         }
         return options;
     }
