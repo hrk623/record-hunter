@@ -16,7 +16,13 @@ public class RecordHunterController {
 
             String query = 'SELECT Id';
             for (RecordHunterField field : fields) {
-                if (!field.path.startsWith(field.objectName.toLowerCase()) || field.name.toLowerCase() != 'id') query += ',' + field.path;
+                if (!field.path.startsWith(field.objectName.toLowerCase()) || field.name.toLowerCase() != 'id') {
+                    if ( field.type.toUpperCase() == 'PICKLIST' || field.type.toUpperCase() == 'MULTIPICKLIST' ) {
+                        query += ',TOLABEL(' + field.path + ')';
+                    } else {
+                        query += ',' + field.path;
+                    }
+                }
             }
             query += ' FROM ' + objectName;
             query += ' WHERE Id IN (\'' + String.join(recordIds, '\',\'') + '\')';     
