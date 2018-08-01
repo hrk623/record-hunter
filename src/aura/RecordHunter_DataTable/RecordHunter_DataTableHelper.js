@@ -40,20 +40,10 @@
            return fields;
         }))
         .then($A.getCallback(function(fields) {
-            var column;
-            const columns = fields.reduce(function(prev, field){
-                column = h.createColumn(c, h, field);
-                if ( field.path.toUpperCase() == c.get('v.objectName').toUpperCase() + '.NAME' ) {
-                    column.type = 'url';
-                    column.typeAttributes = { label: { fieldName: field.path } };
-                    column.fieldName = 'recordPath';
-                }
-                prev.push(column);
+            const columns = fields.reduce(function(prev, field) {
+                prev.push(h.createColumn(c, h, field));
                 return prev;
             }, []);
-            const actions = h.getRowActions.bind(this, c);
-            columns.push({type:'action', typeAttributes:{rowActions: actions}});
-            
              c.set('v.columns', columns);
              c.set('v.fields', fields);
             if (c.get('v.recordIds')) c.set('v.recordIds', c.get('v.recordIds'));
@@ -103,6 +93,22 @@
             return records;
         }))
         .then($A.getCallback(function (records) {
+            const objectNames = c.get('v.fields').reduce(function(prev, field) {
+                prev[field.path] = field.objectName;
+                return prev;
+            }, {});
+            
+            records.forEach(function(record){
+                Object.keys(record).forEach(function(key) {
+                    if (key.endsWith(".name") || key.endsWith(".subject")) {
+                        const pathForId = key.substring(0, key.lastIndexOf(".")) + ".id";
+                        record[key + "__link"] = '/lightning/r/' + objectNames[key] + '/' + record[pathForId] + '/view';
+                    }
+                });
+            });
+            return records;
+        }))
+        .then($A.getCallback(function (records) {
             const data =  c.get("v.data").concat(records);
             c.set('v.data', data);
 
@@ -124,6 +130,15 @@
     createColumn : function(c, h, field) {
         switch (field.type) {
             case 'STRING':
+                if (field.isNameField) {
+                    return {
+                        label:field.label, 
+                        sortable: true,
+                        type: 'url',
+                        typeAttributes: {label: { fieldName: field.path }},
+                        fieldName: field.path + "__link"
+                    }
+                }
             case 'PICKLIST':
             case 'ID':
             case 'TEXTAREA':
@@ -192,20 +207,6 @@
                 }
             }
         );
-    },
-    getRowActions: function (c, row, doneCallback) {
-        const fields = c.get('v.fields');
-        const actions = fields.reduce(function(prev, field) {
-            if (field.isNameField && row[field.path]) {
-                prev.push({
-                    'label': row[field.path],
-                    'iconName': 'utility:new_window',
-                    'name':  field.path.substring(0, field.path.lastIndexOf('.')),
-                });
-            }
-            return prev;
-        }, []);
-        doneCallback(actions);
     },
     flatten : function(c, h, data, objectName) {
         var result = {};
