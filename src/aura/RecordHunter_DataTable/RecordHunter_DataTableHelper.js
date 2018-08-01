@@ -85,9 +85,6 @@
                     } else if (types[key] === "PERCENT") {
                         if (record[key]) record[key] = record[key]/100.0;
                     }
-                    if ( key.toUpperCase() == c.get('v.objectName').toUpperCase() + '.ID' ) {
-                        record['recordPath'] = '/lightning/r/' + c.get('v.objectName') + '/' + record[key] + '/view';
-                    }
                 });
             });
             return records;
