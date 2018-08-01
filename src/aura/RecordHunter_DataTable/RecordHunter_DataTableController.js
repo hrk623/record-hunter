@@ -16,11 +16,12 @@
     onLoadMoreData : function (c, e, h) {
         h.loadData(c, h); 
     },
-        onSort: function (c, e, h) {
-        const fieldName = e.getParam('fieldName');
+    onSort: function (c, e, h) {
+        let fieldName = e.getParam('fieldName');
         const sortDirection = e.getParam('sortDirection');
         c.set("v.sortedBy", fieldName);
         c.set("v.sortedDirection", sortDirection);
+        if (fieldName.endsWith("__link")) fieldName = fieldName.substring(0, fieldName.lastIndexOf("__link"));
         const data = c.get("v.data");
         data.sort(function(a, b) {
             let val1 = a[fieldName], val2 = b[fieldName];
@@ -36,10 +37,7 @@
         c.set("v.data", data);
     },
     onRowAction : function (c, e, h) {
-        const action = e.getParam('action');
-        const row = e.getParam('row');
-        const recordId = row[e.getParam('action').name + '.id'];
-        h.navigateToSObject(c, h, recordId);
+       
     },
     onFlowSelected : function (c, e, h) {
         const selectedIds = c.find('dataTable').getSelectedRows().reduce(function(prev, row) {
