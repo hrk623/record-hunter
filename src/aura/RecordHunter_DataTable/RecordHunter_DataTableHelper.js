@@ -40,8 +40,15 @@
            return fields;
         }))
         .then($A.getCallback(function(fields) {
-            const columns = fields.reduce(function(prev, field){ 
-                prev.push(h.createColumn(c, h, field));
+            var column;
+            const columns = fields.reduce(function(prev, field){
+                column = h.createColumn(c, h, field);
+                if ( field.path.toUpperCase() == c.get('v.objectName').toUpperCase() + '.NAME' ) {
+                    column.type = 'url';
+                    column.typeAttributes = { label: { fieldName: field.path } };
+                    column.fieldName = 'recordPath';
+                }
+                prev.push(column);
                 return prev;
             }, []);
             const actions = h.getRowActions.bind(this, c);
@@ -87,7 +94,10 @@
                         if (record[key]) record[key] = moment.utc(record[key]).format('hh:mm');
                     } else if (types[key] === "PERCENT") {
                         if (record[key]) record[key] = record[key]/100.0;
-                    } 
+                    }
+                    if ( key.toUpperCase() == c.get('v.objectName').toUpperCase() + '.ID' ) {
+                        record['recordPath'] = '/lightning/r/' + c.get('v.objectName') + '/' + record[key] + '/view';
+                    }
                 });
             });
             return records;
