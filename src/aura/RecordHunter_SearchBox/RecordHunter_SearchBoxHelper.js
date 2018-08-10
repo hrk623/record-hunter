@@ -41,6 +41,20 @@
             $A.enqueueAction(action);
         });
     },
+    getObjectsNameFieldName : function(c, h, objectName) {
+        const action = c.get('c.getObjectsNameFieldName');
+        action.setParams({
+            objectName: objectName
+        });
+        return new Promise(function (resolve, reject) {
+            action.setCallback(this, function(response) {
+                const ret = response.getReturnValue();
+                if (response.getState() === 'SUCCESS') ret.hasError ? reject(ret.message) : resolve(ret);
+                else if (response.getState() === 'ERROR') reject(ret.getError());
+            });
+            $A.enqueueAction(action);
+        });
+    },
     findRecords : function(c, h, objectName, keyword, fieldsJson, customLogic) {
         const action = c.get('c.findRecords');
         action.setParams({

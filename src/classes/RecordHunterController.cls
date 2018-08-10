@@ -127,6 +127,15 @@ public class RecordHunterController {
         }
     }
     
+    @AuraEnabled 
+    public static Object getObjectsNameFieldName(String objectName) {
+        try {
+            return [ SELECT QualifiedApiName FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName =: objectName AND IsNameField = true LIMIT 1 ].QualifiedApiName;
+        } catch (Exception e) {
+            return new Error('RecordHunterController.getObjectsNameFieldName : ' + e.getMessage());
+        }
+    }
+    
     private static List<RecordHunterLexer.Token> reduceTokens(List<RecordHunterLexer.Token> tokens, Map<String, RecordHunterField> fields, Boolean isZeroIncluded) {
         List<RecordHunterLexer.Token> reducedTokens = new List<RecordHunterLexer.Token>();
         RecordHunterLexer.Token prev = null, token;
@@ -654,5 +663,14 @@ public class RecordHunterController {
         i--;
         i++;
         i--;
+        i++;
+        i--;
+        i++;
+        i--;
+        i++;
+        i--;
+        i++;
+        i--;
+        i++;
     }
 }
