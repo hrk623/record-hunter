@@ -1,36 +1,31 @@
-<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="RecordHunterController" >
+<aura:component access="global" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"  controller="RecordHunterController" >
     
     <!-- External Libraries -->
     <ltng:require scripts="{!$Resource.RecordHunterLib + '/asset/js/moment.js'}" afterScriptsLoaded="{!c.onAfterScriptsLoaded}" />
     
-    <!-- Global Attributes -->
-    <aura:attribute name="title"                        type="String"  access="global" />
-    <aura:attribute name="objectName"                   type="String"  access="global" />
-    <aura:attribute name="searchBy"                     type="String"  access="global" />
-    <aura:attribute name="searchButtonLabel"            type="String"  access="global" />
-    <aura:attribute name="fieldNames"                   type="String"  access="global" />
-    <aura:attribute name="numColums"                    type="String"  access="global" />
-    <aura:attribute name="isCheckboxIgnoredIfUnchecked" type="Boolean" access="global" default="true" />
-    <aura:attribute name="isObjectNameDisplayed"        type="Boolean" access="global" />
-    <aura:attribute name="isFieldIndexDisplayed"        type="Boolean" access="global" />
-    <aura:attribute name="isConditionFolded"            type="Boolean" access="global" />
-    <aura:attribute name="customLogic"                  type="String"  access="global" default=""/>
-    <aura:attribute name="sectionHeaders"               type="String"  access="global" default=""/>
-    <aura:attribute name="fieldNamesOrDefaultValues"    type="String"  access="global" default=""/>
-    <aura:attribute name="resultTarget"                 type="String"  access="global" />
-    
     <!-- Public Attributes -->
-    <aura:attribute name="keyword"      type="String" access="public" default=''/>
-    <aura:attribute name="recordId"     type="String" access="public" />
-    <aura:attribute name="errorMessage" type="String"  access="public" default=""/>  
+    <aura:attribute access="public" type="String"  name="title"                        />
+    <aura:attribute access="public" type="String"  name="objectName"                   />
+    <aura:attribute access="public" type="String"  name="searchButtonLabel"            />
+    <aura:attribute access="public" type="String"  name="fieldNames"                   />
+    <aura:attribute access="public" type="String"  name="numColums"                    />
+    <aura:attribute access="public" type="Boolean" name="isCheckboxIgnoredIfUnchecked" default="true" />
+    <aura:attribute access="public" type="Boolean" name="isObjectNameDisplayed"        />
+    <aura:attribute access="public" type="Boolean" name="isFieldIndexDisplayed"        />
+    <aura:attribute access="public" type="Boolean" name="isConditionFolded"            />
+    <aura:attribute access="public" type="String"  name="customLogic"                  default=""/>
+    <aura:attribute access="public" type="String"  name="sectionHeaders"               default=""/>
+    <aura:attribute access="public" type="String"  name="fieldNamesOrDefaultValues"    default=""/>
+    <aura:attribute access="public" type="String"  name="keyword"                      default=''/>
+    <aura:attribute access="public" type="String"  name="recordId"                     />
+    <aura:attribute access="public" type="String"  name="errorMessage"                 default=""/>  
     
     <!-- Private Attributes -->
-    <aura:attribute name="fields"             type="Object[]" access="private" default="[]" />
-    <aura:attribute name="isKeywordEnabled"   type="Boolean"  access="private" />
-    <aura:attribute name="isConditionEnabled" type="Boolean"  access="private" />
-    <aura:attribute name="numGroupItems"      type="Integer"  access="private" default="6"/>
-    <aura:attribute name="groups"             type="Object[]" access="private" default="[]" />
-    
+    <aura:attribute access="private" type="Object[]" name="fields"             default="[]" />
+    <aura:attribute access="private" type="Boolean"  name="isKeywordEnabled"   />
+    <aura:attribute access="private" type="Boolean"  name="isConditionEnabled" />
+    <aura:attribute access="private" type="Integer"  name="numGroupItems"      default="6"/>
+    <aura:attribute access="private" type="Object[]" name="groups"             default="[]" />
     
     <!-- Event Handlers -->
     <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
@@ -56,8 +51,8 @@
             
             
             <!-- Keyword Input Section -->
-            <div class="{!'flex keyword' + if(v.isKeywordEnabled, '', ' is-hidden')}">
-                <div class="{!'keyword-filterControl' + if(v.isConditionEnabled, '', ' is-hidden')}">
+            <div class="flex keyword">
+                <div class="{!'keyword-filterControl' + if(empty(v.fieldNames), ' is-hidden', '')}">
                     <lightning:buttonIcon class="{!if(v.isConditionFolded, '', ' is-hidden')}" iconName="utility:jump_to_bottom" variant="border-filled" onclick="{!c.onFilterControlButtonClicked}" alternativeText="Show filtering options" />
                     <lightning:buttonIcon class="{!if(v.isConditionFolded, ' is-hidden', '')}" iconName="utility:jump_to_top" variant="border-filled" onclick="{! c.onFilterControlButtonClicked}" alternativeText="Hide filtering options" />
                 </div>
@@ -69,12 +64,11 @@
             <!-- /Keyword Input Section -->
             
             <!-- Condition Input Section -->
-            <div class="{!'condition' + if(or(!v.isConditionEnabled, and(v.isKeywordEnabled, v.isConditionFolded)), ' is-hidden', '')}">
+            <div class="{!'condition' + if(or(empty(v.fieldNames), and(!empty(v.fieldNames), v.isConditionFolded)), ' is-hidden', '')}">
                 <lightning:layout multipleRows="true" >
                     
                     <!-- Group -->
                     <aura:iteration items="{!v.groups}" var="group" indexVar="groupIndex">
-                        
                         
                         <!-- Section Header -->
                         <aura:if isTrue="{!!empty(group.header)}">
@@ -142,9 +136,6 @@
                     <!-- /Group -->
                     
                 </lightning:layout>
-                <div class="{!'condition-button' + if(!v.isKeywordEnabled, '', ' is-hidden')}">
-                    <lightning:button variant="brand" label="{!v.searchButtonLabel}" onclick="{!c.onSearch}" />
-                </div>
             </div>
             
             <!-- Default Search Result Output -->

@@ -1,0 +1,59 @@
+.THIS {
+}
+
+.THIS .cardbody {
+    margin: 16px;
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid rgb(221, 219, 218);
+    position: relative;
+}
+
+.THIS .controls {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.THIS .control {
+    margin:8px;
+}
+
+.THIS .control.address {
+    flex: 1;
+}
+.THIS .control.address input {
+        padding-left: 24px;
+}
+.THIS .control.address .slds-icon_container {
+    position: absolute;
+    left: 12px;
+    top: 12px;
+}
+
+
+
+
+
+
+.THIS .control.distance {
+    width: 100px;
+    position: relative;
+}
+.THIS .control.distance .slds-input {
+    padding-right: 30px;
+}
+
+.THIS .control.distance:after {
+    content: "km";
+    position: absolute;
+    right: 9px;
+    top: 7px;
+}
+
+.THIS .control.transportation {
+    width: 152px;
+}

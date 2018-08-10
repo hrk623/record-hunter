@@ -46,13 +46,13 @@
             }, []);
              c.set('v.columns', columns);
              c.set('v.fields', fields);
-            if (c.get('v.recordIds')) c.set('v.recordIds', c.get('v.recordIds'));
         }))
         .catch(function(reason) {
             h.showError(c, h, "controller.initColumns : " + reason);
         });        
     },
     loadData : function(c, h) {
+        console.log("loadData");
         
         const recordIds = c.get("v.recordIds");
         const offset = c.get("v.offset");
@@ -74,13 +74,13 @@
                 prev[field.path] = field.type;
                 return prev;
             }, {});
-            
             records.forEach(function(record){
                 Object.keys(record).forEach(function(key) {
                     if (types[key] === "BOOLEAN") {
                         if (record[key] === true) record[key] = c.get('v.true');
                         if (record[key] === false) record[key] = c.get('v.false');
                     } else if (types[key] === "TIME") {
+                        console.log(record[key]);
                         if (record[key]) record[key] = moment.utc(record[key]).format('hh:mm');
                     } else if (types[key] === "PERCENT") {
                         if (record[key]) record[key] = record[key]/100.0;
@@ -89,28 +89,22 @@
             });
             return records;
         }))
-        .then($A.getCallback(function (records) {
-            const objectNames = c.get('v.fields').reduce(function(prev, field) {
-                prev[field.path] = field.objectName;
-                return prev;
-            }, {});
-            
+        .then($A.getCallback(function (records) {            
             records.forEach(function(record){
                 Object.keys(record).forEach(function(key) {
                     if (key.endsWith(".name") || key.endsWith(".subject")) {
                         const pathForId = key.substring(0, key.lastIndexOf(".")) + ".id";
-                        record[key + "__link"] = '/lightning/r/' + objectNames[key] + '/' + record[pathForId] + '/view';
+                        record[key + "__link"] = "/" + record[pathForId];
                     }
                 });
             });
             return records;
         }))
         .then($A.getCallback(function (records) {
+            if (recordIds !== c.get("v.recordIds")) return ;
             const data =  c.get("v.data").concat(records);
-            c.set('v.data', data);
-
+            c.set("v.data", data);
             c.set("v.offset", data.length);
-            
             if (data.length === recordIds.length) {
                c.find("dataTable").set('v.enableInfiniteLoading', false);
             }
@@ -121,8 +115,6 @@
         .then($A.getCallback(function () {
             c.find("dataTable").set("v.isLoading", false);
         }));
-        
-        
     },
     createColumn : function(c, h, field) {
         switch (field.type) {
@@ -289,7 +281,7 @@
             action.setCallback(this, function(response) {
                 const ret = response.getReturnValue();
                 if (response.getState() === 'SUCCESS') ret.hasError ? reject(ret.message) : resolve(ret);
-                else if (response.getState() === 'ERROR') reject(ret.getError());
+                else if (response.getState() === 'ERROR') reject(response.getError());
             });
             $A.enqueueAction(action);
         });
@@ -303,9 +295,9 @@
         });
         return new Promise(function (resolve, reject) {
             action.setCallback(this, function(response) {
-                const ret = response.getReturnValue();
+                const ret = JSON.parse(response.getReturnValue());
                 if (response.getState() === 'SUCCESS') ret.hasError ? reject(ret.message) : resolve(ret);
-                else if (response.getState() === 'ERROR') reject(ret.getError());
+                else if (response.getState() === 'ERROR') reject(response.getError());
             });
             $A.enqueueAction(action);
         });

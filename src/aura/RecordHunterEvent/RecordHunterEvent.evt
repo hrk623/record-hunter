@@ -1,3 +1,5 @@
 <aura:event type="APPLICATION" description="Event for Record Hunter">
     <aura:attribute name="recordIds" type="String[]"/>
+    <aura:attribute name="origin" type="String"/>
+    <aura:attribute name="targets" type="String[]"/>
 </aura:event>

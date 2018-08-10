@@ -1,30 +1,8 @@
 ({
-
     fireAppEvent  : function(c, h, eventDef, evntAttributes) {
         var appEvent = $A.get(eventDef);
         appEvent.setParams(evntAttributes);
         appEvent.fire();
-    },
-    navigateToComponent  : function(c, h, componentDef, componentAttributes) {
-        var evt = $A.get("e.force:navigateToComponent");
-        evt.setParams({
-            componentDef : componentDef,
-            componentAttributes: componentAttributes
-        });
-        evt.fire();
-    },
-     createComponent : function(c, h, componentDef, componentAttributes) {
-         return new Promise(function (resolve, reject) {
-             $A.createComponent(
-                 componentDef,
-                 componentAttributes,
-                 function(newComponent, status, errorMessage){
-                     if (status === "SUCCESS") resolve(newComponent);
-                     else if (status === "INCOMPLETE") reject('No response from server or client is offline.');
-                     else if (status === "ERROR") reject(errorMessage);
-                 }
-             );
-         });
     },
     getFields : function(c, h, objectName, fieldNames) {
         const action = c.get('c.getFields');

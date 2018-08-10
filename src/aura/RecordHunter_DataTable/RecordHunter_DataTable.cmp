@@ -28,7 +28,6 @@
     
     
     <!-- Event Handler -->   
-    <aura:handler name="change"  value="{!v.recordIds}" action="{!c.onRecordIdsChanged}"  />
     <aura:handler event="c:RecordHunterEvent" action="{!c.onRecordHunterEvent}"/>
     <aura:handler name="init" value="{!this}" action="{!c.valueInit}" />
     

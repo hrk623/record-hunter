@@ -1,0 +1,15 @@
+<design:component label="RHT - Location Filter">
+    <design:attribute name="title"                      label="Title"                         required="false" default="Filter by Locations"   description="Title displayed on the component header. A number of records displayed follows."/>
+    <design:attribute name="objectName"                 label="Target Object"                 required="true"  default="Opportunity" description="API name for a target object. Add '__c' for a custom object. "/>
+    <design:attribute name="geolocationFieldName"       label="Geolocation Field Name"        required="true"                        description="API field name for a Geolocation."/>
+    <design:attribute name="titleFieldName"             label="Title Field Name"              required="true"  default="Name"        description="API field name for a name label in information window."/>
+    <design:attribute name="descriptionFieldName"       label="Description Field Name"        required="false"                       description="API field name for a description in information window."/>
+    <design:attribute name="imageURLFieldName"          label="Image URL Field Name"          required="false"                       description="API field name for a image URL in information window."/>
+    
+    <design:attribute name="apikey"                     label="Google API Key"                required="true"                        description="API key obtained from Google Cloud Platform"/>
+    <design:attribute name="vfHost"                     label="Visualforce Hostname"          required="false"                       description="Hostname which visualforce page is hosted. Each org has different one."/>
+    
+    <design:attribute name="height"                     label="Height"                        required="true"  default="500"         description="Height for your map to be displayed"/>
+    <design:attribute name="mode"                       label="Mode"                          required="true"  default="DISTANCE"    datasource="DISTANCE, TRANSPORTATION"        description="A method of deteminf the radius of the circled area on the map."/>
+    <design:attribute name="fieldNamesOrDefaultValues"  label="Default Values or Field Names" required="false" default="JP Tower, 2" description="Default values for Fields. Use ',' for multiple values. The first value is reserved for keyword. field.If the component is placed on Record Detail Page and the value is a valid field name for the record, the value from the record is set."/>
+</design:component>

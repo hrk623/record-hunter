@@ -1,0 +1,66 @@
+<aura:component >
+    <!-- Public Attributes -->
+    <aura:attribute access="public" type="Decimal" required="true"  name="walkingSpeed" default="0.1"  />
+    <aura:attribute access="public" type="Decimal" required="false" name="drivingSpeed" default="1" />
+    <aura:attribute access="public" type="Decimal" required="false" name="trainSpeed"   default="0.67" />
+    <aura:attribute access="public" type="Decimal" required="false" name="distance" />
+    <aura:attribute access="public" type="Decimal" required="false" name="time" />
+    
+    <!-- Private Attributes -->
+    <aura:attribute access="private" type="String"  name="transportation" default="WALKING" />
+    <aura:attribute access="private" type="Boolean" name="isMenuOpen" default="false" />    
+    
+    <!-- Event Handlers -->
+    <aura:handler name="init"   value="{!this}"     action="{!c.onInit}"    />
+    <aura:handler name="change" value="{!v.time}" action="{!c.onTimeChanged}"  />
+    
+    <div>
+        <div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open transportation">
+            <button class="slds-button slds-button_neutral" aria-haspopup="true" onclick="{!c.onTransportaionClicked}">
+                <span class="label">
+                    <aura:if isTrue="{!v.transportation=='DRIVING'}">
+                        <lightning:icon iconName="custom:custom31" alternativeText="Car"  />
+                    </aura:if>
+                    <aura:if isTrue="{!v.transportation=='TRAIN'}">
+                        <lightning:icon iconName="custom:custom36" alternativeText="Train"  />
+                    </aura:if>
+                    <aura:if isTrue="{!v.transportation=='WALKING'}">
+                        <lightning:icon iconName="utility:trail" alternativeText="Walking" />
+                    </aura:if>
+                    <lightning:icon iconName="utility:down" alternativeText="Choose Transportation" size="xx-small"  />
+                </span>
+            </button>
+            <aura:if isTrue="{!v.isMenuOpen}">
+                <div class="slds-dropdown slds-dropdown_left">
+                    <ul class="slds-dropdown__list" role="menu" aria-label="Show More">
+                        <aura:if isTrue="{!v.walkingSpeed}">
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a href="javascript:void(0);" role="menuitem"  onclick="{!c.onTransportationSelected}" data-transportation="WALKING">
+                                    <lightning:icon iconName="utility:trail" alternativeText="Walking" />
+                                </a>
+                            </li>
+                        </aura:if>
+                        <aura:if isTrue="{!v.drivingSpeed}">
+                            <li class="slds-dropdown__item" role="presentation" onclick="{!c.onTransportationSelected}" data-transportation="DRIVING">
+                                <a href="javascript:void(0);" role="menuitem" tabindex="0">
+                                    <lightning:icon iconName="custom:custom31" alternativeText="car"  />
+                                </a>
+                            </li>
+                        </aura:if>
+                        <aura:if isTrue="{!v.trainSpeed}">
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a href="javascript:void(0);" role="menuitem"  onclick="{!c.onTransportationSelected}" data-transportation="TRAIN">
+                                    <lightning:icon iconName="custom:custom36" alternativeText="Train"  />
+                                </a>
+                            </li>
+                        </aura:if>
+                    </ul>
+                </div>
+            </aura:if>
+        </div>
+        <div class="time" >
+            <lightning:input type="number" name="time" label="dummy" variant="label-hidden" value="{!v.time}"  min="1"/>
+            <lightning:icon class="icon" iconName="utility:clock" alternativeText="time" size="x-small" />
+        </div>
+    </div>
+</aura:component>

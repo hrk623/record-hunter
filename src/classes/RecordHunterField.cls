@@ -10,7 +10,7 @@ public class RecordHunterField {
             this.isSelected = false;
         }
     }
-    
+
     @AuraEnabled public String objectLabel;
     @AuraEnabled public String objectName;
     @AuraEnabled public String label;
@@ -28,6 +28,9 @@ public class RecordHunterField {
     @AuraEnabled public String value;
     @AuraEnabled public String minValue;
     @AuraEnabled public String maxValue;
+    @AuraEnabled public String latitude;
+    @AuraEnabled public String longitude;
+    @AuraEnabled public String distance;
     @AuraEnabled public String index;
 
     @AuraEnabled public Boolean isValid;
@@ -101,6 +104,10 @@ public class RecordHunterField {
                 ret = String.isNotBlank(this.value) ? this.path + ' INCLUDES (\'' + this.value + '\')' : '';
             } when 'BOOLEAN' {
                 ret = String.isNotBlank(this.value) ? this.path + ' = ' + (this.value == 'true') : '';
+            } when 'LOCATION' {
+                if (String.isNotBlank(this.latitude) && String.isNotBlank(this.longitude) && String.isNotBlank(this.distance)){
+                    ret = 'DISTANCE(' + this.path +', GEOLOCATION(' + this.latitude + ',' + this.longitude + '), \'km\') < ' + this.distance;
+                }
             }
         }
         return ret;
@@ -110,6 +117,8 @@ public class RecordHunterField {
         if (this.type=='INTEGER' || this.type=='PERCENT' || this.type=='CURRENCY' || this.type=='DOUBLE' 
             || this.type=='DATETIME' || this.type=='DATE' || this.type=='TIME') 
             return String.isNotEmpty(this.minValue) || String.isNotEmpty(this.maxValue);
+        if (this.type=='LOCATION')
+            return String.isNotBlank(this.latitude) && String.isNotBlank(this.longitude) && String.isNotBlank(this.distance);
         else return String.isNotEmpty(this.value);
     }
     

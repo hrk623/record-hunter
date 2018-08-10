@@ -9,10 +9,16 @@
         <name>ApexClass</name>
     </types>
     <types>
+        <members>RecordHunter_GoogleMap</members>
+        <name>ApexPage</name>
+    </types>
+    <types>
         <members>RecordHunterEvent</members>
         <members>RecordHunter_DataTable</members>
+        <members>RecordHunter_LocationFilter</members>
         <members>RecordHunter_MultiSelect</members>
         <members>RecordHunter_SearchBox</members>
+        <members>RecordHunter_TransportationInput</members>
         <name>AuraDefinitionBundle</name>
     </types>
     <types>

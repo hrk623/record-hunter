@@ -1,20 +1,6 @@
 ({
     onInit : function(c, e, h) {
-        switch (c.get("v.searchBy")) {
-            case "KEYWORD":
-                c.set("v.isKeywordEnabled", true);
-                c.set("v.isConditionEnabled", false);
-                break;
-            case "CONDITION":
-                c.set("v.isKeywordEnabled", false);
-                c.set("v.isConditionEnabled", true);
-                break;
-            case "BOTH":
-                c.set("v.isKeywordEnabled", true);
-                c.set("v.isConditionEnabled", true);
-                break;
-        }
-        
+
     },
     onAfterScriptsLoaded : function(c, e, h) {
         // We will first tidy up field names by eliminate redundant spaces
@@ -57,11 +43,11 @@
             fields.forEach(function(field) {
                 if (!field) {
                     fields[index] = null;
-                } else if (!field.isFilterable) {
+                } else if (!field.isFilterable && field.type !== "LOCATION" ) {
                     h.showError(c, h, `onAfterScriptsLoaded : The type '${field.name}' of '${field.objectName}' is not a queryable field.`);
                     fields[index] = null;
                 } else if (field.type == "ADDRESS" || field.type == "COMBOBOX" || field.type == "REFERENCE" || field.type == "ANYTYPE" 
-                           || field.type == "BASE64" || field.type == "DATACATEGORYGROUPREFERENCE" || field.type == "ENCRYPTEDSTRING") {
+                           || field.type == "BASE64" || field.type == "DATACATEGORYGROUPREFERENCE" || field.type == "ENCRYPTEDSTRING" || field.type == "LOCATION") {
                     h.showError(c, h, `onAfterScriptsLoaded : The type '${field.type}' for '${field.name}' of '${field.objectName}' is unsupported.`);
                     fields[index] = null;
                 } else {
@@ -81,7 +67,7 @@
             // On the other hand, invalid fields don't consume values 
             // since invalid fields are always invalid no matter who is running the component. 
             
-            if (c.get("v.isKeywordEnabled")) c.set("v.keyword", defaultValues.shift());
+            c.set("v.keyword", defaultValues.shift());
             fields.forEach(function(field) {
                 if (!field) {
                     // skip if null or invalid
@@ -136,8 +122,6 @@
             
             // Then we will derive a default logic if no custom logic is specified.
             // The index 0 is reserved for keyword, and the rest follows the index of each field.`
-            const isKeywordEnabled = c.get("v.isKeywordEnabled");
-            const isConditionEnabled = c.get("v.isConditionEnabled");
             let customLogic = c.get("v.customLogic");
             
             if (!customLogic) {
@@ -146,9 +130,8 @@
                     return prev;
                 }, []);
                 
-                customLogic = isKeywordEnabled ? "0" : ""; 
-                customLogic += isKeywordEnabled && isConditionEnabled && indices.length > 0 ? " AND " : ""; 
-                customLogic += isConditionEnabled ? indices.join(" AND ") : "";
+                customLogic = "0"
+                customLogic += indices.length > 0 ? " AND " + indices.join(" AND ") : ""; 
             }            
             c.set("v.customLogic", customLogic);
             
@@ -184,8 +167,6 @@
         }); 
         
     },
-    
-    
     onFilterControlButtonClicked : function(c, e, h) {
         c.set("v.isConditionFolded", !c.get("v.isConditionFolded"));
     },
@@ -196,11 +177,9 @@
         // - to show an indicator.
         // - to get rid of all of null conditions.
         // - to format values into the expected form of SOQL queries.
-        
         h.showSpinner(c, h);
         
         const fields = c.get("v.fields").filter(function(field) {return field; });
-        
         fields.forEach(function(field) {
             if (field.type === "DATETIME") {
                 if (field.minValue) field.minValue = moment(field.minValue).format("YYYY-MM-DDThh:mm:ssZ");
@@ -214,51 +193,18 @@
                 }
             }
         });
-        
-       
-        
+
         // Now it is time to request the server to query the records.
         // The respose form the serve is only the record IDs of matching records.
         // Since this is a searching component, we will let other components to do the diplay.
         // There are 3 options;
-        // - DEFAULT: create a datatable component to show the result.
         // - TAB    : open a new page, or tab if your on console, to show the result in a datatable.
         // - EVENT  : fire a RecordHunterEvent which is an application event to propagate the result to other component in the same page.
-        
         h.findRecords(c, h, c.get("v.objectName"), c.get("v.keyword"), JSON.stringify(fields), c.get("v.customLogic"))
         .then($A.getCallback(function(recordIds) {
-
-            console.log(recordIds.length);
-            
-            switch(c.get("v.resultTarget")) {
-                case "DEFAULT":
-                    h.createComponent(c, h, "c:RecordHunter_DataTable", {
-                        objectName : c.get("v.objectName"),
-                        fieldNames : c.get("v.fieldNames"),
-                        recordId :  c.get("v.recordId"),
-                        recordIds : recordIds,
-                    })
-                    .then($A.getCallback(function(component) {
-                        c.set("v.body", [component]);
-                    }))
-                    .catch(function(reason) {
-                        h.showError(c, h, "onSearch : " + reason);
-                    });         
-                    break;
-                case "TAB":
-                    h.navigateToComponent(c, h, "c:RecordHunter_DataTable", {
-                        objectName : c.get("v.objectName"),
-                        fieldNames : c.get("v.fieldNames"),
-                        recordId :  c.get("v.recordId"),
-                        recordIds : recordIds,
-                    });
-                    break;
-                case "EVENT":
-                    h.fireAppEvent(c, h, "e.c:RecordHunterEvent", {
-                        recordIds : recordIds,
-                    });
-                    break;
-            }
+            h.fireAppEvent(c, h, "e.c:RecordHunterEvent", {
+                recordIds : recordIds,
+            });
         }))
         .catch(function(reason) {
             h.showError(c, h, "onSearch : " + reason);

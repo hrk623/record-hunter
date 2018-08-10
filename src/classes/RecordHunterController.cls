@@ -17,7 +17,7 @@ public class RecordHunterController {
             String query = 'SELECT Id';
             for (RecordHunterField field : fields) {
                 if (!field.path.startsWith(field.objectName.toLowerCase()) || field.name.toLowerCase() != 'id') {
-                    if ( field.type.toUpperCase() == 'PICKLIST' || field.type.toUpperCase() == 'MULTIPICKLIST' ) {
+                    if (field.type.toUpperCase() == 'PICKLIST' || field.type.toUpperCase() == 'MULTIPICKLIST') {
                         query += ',TOLABEL(' + field.path + ')';
                     } else {
                         query += ',' + field.path;
@@ -28,9 +28,11 @@ public class RecordHunterController {
             query += ' WHERE Id IN (\'' + String.join(recordIds, '\',\'') + '\')';     
             System.debug(query);
             
-            return Database.query(query);
+            
+            List<Sobject> olist = Database.query(query);
+           return JSON.serialize(olist);
         } catch (Exception e) {
-            return new Error('RecordHunterController.getRecords : ' + e.getMessage());
+            return JSON.serialize(new Error('RecordHunterController.getRecords : ' + e.getMessage()));
         }
     }    
     @AuraEnabled 
@@ -40,6 +42,7 @@ public class RecordHunterController {
             String objectName = recordIdFromString.getSObjectType().getDescribe().getName();
 
             List<String> fieldNameOrDefaultValueList = fieldNamesOrDefaultValues.split(',');
+            System.debug(fieldNameOrDefaultValueList);
             
             Set<String> fieldNameSet = new Set<String> {'Id'};
             for (String fieldNameOrDefaultValue : fieldNameOrDefaultValueList) {
@@ -54,11 +57,21 @@ public class RecordHunterController {
             }
                         
             List<String> defaultValueList = new List<String>();
-            for (String fieldNameOrDefaultValue : fieldNameOrDefaultValueList) {
+            for (String fieldNameOrDefaultValue : fieldNameOrDefaultValueList) {   
                 if (String.isNotBlank(fieldNameOrDefaultValue) && Schema.getGlobalDescribe().get(objectName).getDescribe().fields.getMap().containsKey(fieldNameOrDefaultValue.trim())) {
                     Object value = record.get(fieldNameOrDefaultValue.trim());
-                    if (value == null) defaultValueList.add('');
-                    else defaultValueList.add(String.valueOf(value));
+                    if (value == null) {
+                        defaultValueList.add('');
+                    } else if (value instanceof System.Address) {
+                        System.Address address = (System.Address)value;
+                        defaultValueList.add(String.join(new List<String>{address.state, address.city, address.street}, ' '));
+                    } else if (value instanceof System.Location) {
+                        System.Location location = (System.Location)value;
+                        defaultValueList.add(String.valueOf(location.getLatitude()));
+                        defaultValueList.add(String.valueOf(location.getLongitude()));
+                    } else {
+                        defaultValueList.add(String.valueOf(value));
+                    }
                 } else {
                     defaultValueList.add(fieldNameOrDefaultValue);
                 }
@@ -68,15 +81,68 @@ public class RecordHunterController {
         } catch (Exception e) {
             return new Error('RecordHunterController.getRecords : ' + e.getMessage());
         }
-    }    
+    }
+
+    
+    @AuraEnabled 
+    public static Object filterRecords(String objectName, String recordIdsJson, String fieldsJson, String customLogic) {
+        try {
+            System.debug(objectName);
+            System.debug(recordIdsJson);
+            System.debug(fieldsJson);
+            System.debug(customLogic);
+            
+            List<String> recordIds = (List<String>)JSON.deserialize(recordIdsJson, List<String>.class);       
+            System.debug(recordIds);
+            
+            Map<String, RecordHunterField> fields = new Map<String, RecordHunterField>();
+            
+            List<RecordHunterField> fieldList = (List<RecordHunterField>)JSON.deserialize(fieldsJson, List<RecordHunterField>.class);
+            System.debug(fieldList);
+            for(RecordHunterField field : fieldList) {
+                fields.put(field.index, field);
+            } 
+             System.debug(fields);
+            
+            // Build conditions for WHERE clause
+            List<RecordHunterLexer.Token> tokens = RecordHunterLexer.tokenize(customLogic);
+            List<RecordHunterLexer.Token> reducedToken = reduceTokens(tokens, fields, true);   
+            System.debug(reducedToken);
+            
+            
+            String conditions = '';
+            for (RecordHunterLexer.Token token : reducedToken) {
+                if (token.kind == RecordHunterLexer.Kind.ZERO) {
+                    conditions += 'Id in (\'' + String.join(recordIds, '\',\'') + '\')';
+                } else if (token.kind == RecordHunterLexer.Kind.NUM) {
+                    conditions += fields.get(token.lexeme).getWhereCondition();
+                } else {
+                    conditions += ' ' + token.lexeme + ' ';    
+                }
+            }
+            
+            // Find records by conditions
+            String query = 'SELECT Id FROM ' + objectName ;
+            query += String.isNotEmpty(conditions) ? ' WHERE ' + conditions : '';
+            System.debug(query);
+            
+            return JSON.serialize((new Map<Id, SObject>(Database.query(query))).keySet());
+        } catch (Exception e) {
+            return JSON.serialize(new Error('RecordHunterController.filterRecords: ' + e.getMessage()));
+        }
+    }
+    
 
     @AuraEnabled 
     public static Object findRecords(String objectName, String keyword, String fieldsJson, String customLogic) {
         try {
+            System.debug(keyword);
             
             // Find records by keyword
             String findRecordsByKeywordQuery = 'FIND \'' + keyword + '\' IN ALL FIELDS RETURNING ' + objectName + ' (Id ORDER BY Id)';
-            List<Id> findRecordsByKeywordResult = String.isNotEmpty(keyword) ? new list<Id>(new Map<Id, SObject>(search.query(findRecordsByKeywordQuery)[0]).keySet()) : new List<Id>();
+            List<Id> findRecordsByKeywordResult = String.isNotBlank(keyword) ? new list<Id>(new Map<Id, SObject>(search.query(findRecordsByKeywordQuery)[0]).keySet()) : new List<Id>();
+            
+            System.debug(findRecordsByKeywordResult.size());
             
             // Deserialize Fields
             

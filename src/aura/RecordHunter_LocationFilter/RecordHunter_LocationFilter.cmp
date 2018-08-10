@@ -1,0 +1,95 @@
+<aura:component  access="global" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" controller="RecordHunterController">
+    <!-- Public Attributes -->
+    <aura:attribute access="public" type="String" name="title"       />
+    <aura:attribute access="public" type="String" name="objectName" />
+    <aura:attribute access="public" type="String" name="geolocationFieldName" />
+    
+    
+    <aura:attribute access="public" type="String" name="height" />
+    <aura:attribute access="public" type="String" name="titleFieldName" />
+    <aura:attribute access="public" type="String" name="descriptionFieldName" />
+    <aura:attribute access="public" type="String" name="imageURLFieldName" />
+    
+    <aura:attribute access="public" type="String" name="apikey"   />
+    <aura:attribute access="public" type="String" name="vfHost"  />
+    <aura:attribute access="public" type="String" name="errorMessage"  /> 
+    
+    <aura:attribute access="public" type="String" name="mode" default="DISTANCE" />
+    
+    <aura:attribute access="public" type="String" name="fieldNamesOrDefaultValues" />
+    <aura:attribute access="public" type="String" name="recordId"                  />
+    
+    <!-- Private Attributes -->
+    <aura:attribute access="private" type="String[]" name="recordIds"/>
+    <aura:attribute access="private" type="Object[]" name="fields"   />
+    <aura:attribute access="private" type="Object[]" name="defaultValues"  />
+    
+    <aura:attribute access="private" type="String"   name="location" />
+    <aura:attribute access="private" type="Decimal"  name="distance" />
+    <aura:attribute access="private" type="Decimal"  name="time" />
+    
+    <aura:attribute access="private" type="Object"   name="center"   />
+    <aura:attribute access="private" type="Object[]" name="markers"  />
+    <aura:attribute access="private" type="Object[]" name="circles"  />
+    
+    <aura:attribute access="private" type="String" name="componentId" default="RECORDHUNTER_MAP" />
+    
+    <!-- Event Handler -->
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    <aura:handler event="c:RecordHunterEvent" action="{!c.onRecordHunterEvent}"/>
+    <aura:handler name="change" value="{!v.center}" action="{!c.onCenterChanged}"  />
+    <aura:handler name="change" value="{!v.markers}" action="{!c.onMarkersChanged}"  />
+    <aura:handler name="change" value="{!v.circles}" action="{!c.onCirclesChanged}"  />
+    <aura:handler name="change" value="{!v.distance}" action="{!c.onDistanceChanged}"  />
+    
+    <!-- Event Register -->
+    <aura:registerEvent name="appEvent" type="c:RecordHunterEvent"/>
+    
+    <!-- User Interface -->
+    <div>
+        <!-- Card -->
+        <lightning:card >
+            
+            <!-- Card Header -->
+            <aura:set attribute="title">
+                <aura:if isTrue="{!!empty(v.title)}">
+                    <lightning:icon iconName="custom:custom78" size="small" />　{!v.title}({!v.recordIds.length})
+                </aura:if>
+            </aura:set>
+            <!-- /Card Header -->
+            
+            
+            <!-- Card Body -->
+            <aura:if isTrue="{!!empty(v.errorMessage)}">
+                <ui:message title="Error" severity="error" closable="false">{!v.errorMessage}</ui:message>
+            </aura:if> 
+            
+            <div class="cardbody">
+                <iframe aura:id="iframe" class="iframe" style="{!'height:calc(' + v.height + 'px - 10px);'}"  frameborder="0" width="100%" src="/apex/RecordHunter_GoogleMap" onload="{!c.onLoad}"/>
+                
+                <div class="controls">
+                    <div class="control address">
+                        <lightning:input  name="search" label="dummy" variant="label-hidden" value="{!v.location}" onblur="{!c.onLocationChanged}"/>
+                        <lightning:icon iconName="utility:checkin" alternativeText="checkin" size="x-small" />
+                    </div>                    
+                    
+                    <aura:if isTrue="{!v.mode=='DISTANCE'}"> 
+                        <div class="control distance">
+                            <lightning:input type="number" name="number" label="dummy" variant="label-hidden" value="{!v.distance}" />
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.mode=='TRANSPORTATION'}"> 
+                        <div class="control transportation">
+                            <c:RecordHunter_TransportationInput distance="{!v.distance}" time="{!v.time}"/>
+                        </div>
+                    </aura:if>
+                </div>
+            </div>
+            <!-- /Card Body -->
+            
+        </lightning:card>
+        <!-- /Card -->
+        
+    </div>
+    
+</aura:component>
