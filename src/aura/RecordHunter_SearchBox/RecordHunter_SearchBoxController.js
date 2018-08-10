@@ -232,26 +232,46 @@
             
             switch(c.get("v.resultTarget")) {
                 case "DEFAULT":
-                    h.createComponent(c, h, "c:RecordHunter_DataTable", {
-                        objectName : c.get("v.objectName"),
-                        fieldNames : c.get("v.fieldNames"),
-                        recordId :  c.get("v.recordId"),
-                        recordIds : recordIds,
-                    })
-                    .then($A.getCallback(function(component) {
-                        c.set("v.body", [component]);
-                    }))
+                case "TAB":
+                    h.getObjectsNameFieldName(c, h, c.get("v.objectName"))
                     .catch(function(reason) {
                         h.showError(c, h, "onSearch : " + reason);
-                    });         
-                    break;
-                case "TAB":
-                    h.navigateToComponent(c, h, "c:RecordHunter_DataTable", {
-                        objectName : c.get("v.objectName"),
-                        fieldNames : c.get("v.fieldNames"),
-                        recordId :  c.get("v.recordId"),
-                        recordIds : recordIds,
-                    });
+                    })
+                    .then($A.getCallback(function(objectsNameFieldName) {
+                        let fieldNames = c.get("v.fieldNames");
+                        if (!c.get("v.fields").some(function(field) {
+                            return ( field.path == ( c.get("v.objectName") + '.' + objectsNameFieldName ).toLowerCase() );
+                        })) {
+                            fieldNames = objectsNameFieldName + ',' + fieldNames;
+                        }
+                        return fieldNames;
+                    }))
+                    .then($A.getCallback(function(fieldNames) {
+                        switch(c.get("v.resultTarget")) {
+                            case "DEFAULT":
+                                h.createComponent(c, h, "c:RecordHunter_DataTable", {
+                                    objectName : c.get("v.objectName"),
+                                    fieldNames : fieldNames,
+                                    recordId :  c.get("v.recordId"),
+                                    recordIds : recordIds,
+                                })
+                                .then($A.getCallback(function(component) {
+                                    c.set("v.body", [component]);
+                                }))
+                                .catch(function(reason) {
+                                    h.showError(c, h, "onSearch : " + reason);
+                                });
+                                break;
+                            case "TAB":
+                                h.navigateToComponent(c, h, "c:RecordHunter_DataTable", {
+                                    objectName : c.get("v.objectName"),
+                                    fieldNames : fieldNames,
+                                    recordId :  c.get("v.recordId"),
+                                    recordIds : recordIds,
+                                });
+                                break;
+                        }
+                    }));
                     break;
                 case "EVENT":
                     h.fireAppEvent(c, h, "e.c:RecordHunterEvent", {
