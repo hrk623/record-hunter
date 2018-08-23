@@ -63,6 +63,10 @@
         switch(e.getParam('status')) {
             case 'FINISHED':
                 c.set('v.modalBody', []);
+                c.find("dataTable").set("v.enableInfiniteLoading", true);
+                c.set("v.offset", 0);
+                c.set('v.data', []);
+                h.loadData(c, h);
                 break;
             case 'FINISHED_SCREEN':
             case 'STARTED':
