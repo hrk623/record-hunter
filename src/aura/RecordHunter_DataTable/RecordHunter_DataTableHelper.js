@@ -81,7 +81,7 @@
                         if (record[key] === false) record[key] = c.get('v.false');
                     } else if (types[key] === "TIME") {
                         console.log(record[key]);
-                        if (record[key]) record[key] = moment.utc(record[key]).format('hh:mm');
+                        if (record[key]) record[key] = moment.utc("1970-01-01 "+record[key]).format('hh:mm');
                     } else if (types[key] === "PERCENT") {
                         if (record[key]) record[key] = record[key]/100.0;
                     }
