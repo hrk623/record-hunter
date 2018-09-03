@@ -20,7 +20,6 @@
         const sortDirection = e.getParam('sortDirection');
         c.set("v.sortedBy", fieldName);
         c.set("v.sortedDirection", sortDirection);
-        if (fieldName.endsWith("__link")) fieldName = fieldName.substring(0, fieldName.lastIndexOf("__link"));
         const data = c.get("v.data");
         data.sort(function(a, b) {
             let val1 = a[fieldName], val2 = b[fieldName];
@@ -36,6 +35,15 @@
         c.set("v.data", data);
     },
     onRowAction : function (c, e, h) {
+        const action = e.getParam('action');
+        const row = e.getParam('row');
+        switch (action.name) {
+            case 'showDetail':
+                const key = action.label.fieldName;
+                const pathForId = key.substring(0, key.lastIndexOf(".")) + ".id";
+                h.navigateToSObject(c, h, row[pathForId]);
+                break;
+        }
     },
     onFlowSelected : function (c, e, h) {
         const selectedIds = c.find('dataTable').getSelectedRows().reduce(function(prev, row) {
