@@ -89,17 +89,6 @@
             });
             return records;
         }))
-        .then($A.getCallback(function (records) {            
-            records.forEach(function(record){
-                Object.keys(record).forEach(function(key) {
-                    if (key.endsWith(".name") || key.endsWith(".subject")) {
-                        const pathForId = key.substring(0, key.lastIndexOf(".")) + ".id";
-                        record[key + "__link"] = "/" + record[pathForId];
-                    }
-                });
-            });
-            return records;
-        }))
         .then($A.getCallback(function (records) {
             if (recordIds !== c.get("v.recordIds")) return ;
             const data =  c.get("v.data").concat(records);
@@ -121,11 +110,11 @@
             case 'STRING':
                 if (field.isNameField) {
                     return {
-                        label:field.label, 
+                        label: field.label, 
                         sortable: true,
-                        type: 'url',
-                        typeAttributes: {label: { fieldName: field.path }},
-                        fieldName: field.path + "__link"
+                        type: 'button',
+                        typeAttributes: {name: "showDetail", label: {fieldName: field.path}, variant: "base"},
+                        fieldName: field.path,
                     }
                 }
             case 'PICKLIST':
