@@ -37,3 +37,7 @@
 .THIS .slds-scrollable_y {
     min-height: 100%;
 }
+
+.THIS .slds-button {
+    white-space: nowrap;
+}
