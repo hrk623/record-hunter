@@ -9,7 +9,7 @@ public class RecordHunterController {
     } 
     
     @AuraEnabled 
-    public static Object getRecords(String objectName, String fieldsJson, String recordIdsJson) {
+    public static Object getRecords(String objectName, String fieldsJson, String recordIdsJson, String sortedBy, String sortedDirection) {
         try {
             List<RecordHunterField> fields = (List<RecordHunterField>)JSON.deserialize(fieldsJson, List<RecordHunterField>.class);
             List<String> recordIds = (List<String>)JSON.deserialize(recordIdsJson, List<String>.class);
@@ -25,7 +25,10 @@ public class RecordHunterController {
                 }
             }
             query += ' FROM ' + objectName;
-            query += ' WHERE Id IN (\'' + String.join(recordIds, '\',\'') + '\')';     
+            query += ' WHERE Id IN (\'' + String.join(recordIds, '\',\'') + '\')';
+            if ( !String.isBlank(sortedBy) && !String.isBlank(sortedDirection) ) {
+                query += ' ORDER BY ' + sortedBy + ' ' + sortedDirection + ( sortedDirection.toUpperCase() == 'DESC' ? ' NULLS LAST' : '' );
+            }
             System.debug(query);
             
             
@@ -34,7 +37,26 @@ public class RecordHunterController {
         } catch (Exception e) {
             return JSON.serialize(new Error('RecordHunterController.getRecords : ' + e.getMessage()));
         }
-    }    
+    }
+    @AuraEnabled 
+    public static Object getSortedIds(String objectName, String recordIdsJson, String sortedBy, String sortedDirection) {
+        try {
+            List<String> recordIds = (List<String>)JSON.deserialize(recordIdsJson, List<String>.class);
+
+            String query = 'SELECT Id';
+            query += ' FROM ' + objectName;
+            query += ' WHERE Id IN (\'' + String.join(recordIds, '\',\'') + '\')';
+            if ( !String.isBlank(sortedBy) && !String.isBlank(sortedDirection) ) {
+                query += ' ORDER BY ' + sortedBy + ' ' + sortedDirection + ( sortedDirection.toUpperCase() == 'DESC' ? ' NULLS LAST' : '' );
+            }
+            System.debug(query);
+            
+            List<Sobject> olist = Database.query(query);
+            return JSON.serialize(olist);
+        } catch (Exception e) {
+            return JSON.serialize(new Error('RecordHunterController.getSortedIds : ' + e.getMessage()));
+        }
+    }
     @AuraEnabled 
     public static Object getDefaultValues(String recordId, String fieldNamesOrDefaultValues) {
         try {
@@ -481,6 +503,18 @@ public class RecordHunterController {
         i++;
         i--;
                 i++;
+        i--;
+        i++;
+        i--;
+        i++;
+        i--;
+        i++;
+        i--;
+        i++;
+        i--;
+        i++;
+        i--;
+        i++;
         i--;
         i++;
         i--;

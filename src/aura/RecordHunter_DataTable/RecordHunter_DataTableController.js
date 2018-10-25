@@ -17,22 +17,20 @@
     },
     onSort: function (c, e, h) {
         let fieldName = e.getParam('fieldName');
+        const newRecordIds = new Array();
         const sortDirection = e.getParam('sortDirection');
         c.set("v.sortedBy", fieldName);
         c.set("v.sortedDirection", sortDirection);
-        const data = c.get("v.data");
-        data.sort(function(a, b) {
-            let val1 = a[fieldName], val2 = b[fieldName];
-            val1 = typeof val1 === 'string' || val1 instanceof String ? val1.toUpperCase() : val1;
-            val2 = typeof val2 === 'string' || val2 instanceof String ? val2.toUpperCase() : val2;
-            const reverse = sortDirection === 'asc' ? 1 : -1;
-            if(val1 === undefined) return -1 * reverse;
-            if(val2 === undefined) return 1 * reverse;
-            if(val1 < val2) return -1 * reverse;
-            if(val1 > val2) return 1 * reverse;
-            return 0;
-        })
-        c.set("v.data", data);
+        h.getSortIds(c, h)
+        .then($A.getCallback(function(records) {
+            records.forEach(function(record, index){
+                newRecordIds.push(record['Id']);
+            });
+            $A.get("e.c:RecordHunterEvent").setParams({ recordIds : newRecordIds }).fire();
+        }))
+        .catch(function(reason) {
+            h.showError(c, h, "controller.onSort : " + reason);
+        });
     },
     onRowAction : function (c, e, h) {
         const action = e.getParam('action');
