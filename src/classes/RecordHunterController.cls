@@ -222,7 +222,7 @@ public class RecordHunterController {
                 else if (prev.kind == RecordHunterLexer.Kind.NUM)        reducedTokens.add(token);
                 else if (prev.kind == RecordHunterLexer.Kind.ZERO)       reducedTokens.add(token);
             } else if (token.kind == RecordHunterLexer.Kind.LPAREN) {
-                if (prev == null) continue;
+                if (prev == null) reducedTokens.add(token);
                 else if (prev.kind == RecordHunterLexer.Kind.LOGICALAND) reducedTokens.add(token);
                 else if (prev.kind == RecordHunterLexer.Kind.LOGICALOR)  reducedTokens.add(token);
                 else if (prev.kind == RecordHunterLexer.Kind.LPAREN)     reducedTokens.add(token);
