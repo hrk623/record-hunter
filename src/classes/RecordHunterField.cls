@@ -93,7 +93,16 @@ public class RecordHunterField {
                         ret = this.path + ' = \'' + this.value + '\'';
                     }
                 }
-            } when 'INTEGER', 'PERCENT', 'CURRENCY', 'DOUBLE', 'DATETIME', 'DATE', 'TIME'  {
+            } when 'INTEGER', 'PERCENT', 'CURRENCY', 'DOUBLE' {
+                if (String.isNotBlank(this.minValue)){
+                    ret = this.path + ' >= ' + (this.minValue.contains('.') ? this.minValue : this.minValue + '.0');
+                }
+                ret += String.isNotBlank(this.minValue) && String.isNotBlank(this.maxValue) ? ' AND ' : '';
+                if (String.isNotBlank(this.maxValue)){
+                    ret +=  this.path + ' <= ' + (this.maxValue.contains('.') ? this.maxValue : this.maxValue + '.0');
+                }
+                ret =  String.isNotBlank(this.minValue) && String.isNotBlank(this.maxValue) ? '(' + ret + ')' : ret;
+            } when 'DATETIME', 'DATE', 'TIME'  {
                 ret =  String.isNotBlank(this.minValue) ? this.path + ' >= ' + this.minValue : '';
                 ret += String.isNotBlank(this.minValue) && String.isNotBlank(this.maxValue) ? ' AND ' : '';
                 ret += String.isNotBlank(this.maxValue) ? this.path + ' <= ' + this.maxValue : '';
