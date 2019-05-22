@@ -8,13 +8,16 @@
     <aura:attribute name="recordIds"           type="String[]"         access="public" default="[]" />
     <aura:attribute name="flowNames"           type="String"           access="public" default="" />
     <aura:attribute name="flowLabels"          type="String"           access="public" default="" />
+    <aura:attribute name="flowParameters"      type="String"           access="public" default="Record IDs"/>  
     <aura:attribute name="true"                type="String"           access="public" default="true" />
     <aura:attribute name="false"               type="String"           access="public" default="false" /> 
     <aura:attribute name="messageWhenNoResult" type="String"           access="public" /> 
-    <aura:attribute name="modalBody"           type="Aura.Component[]" access="public" />
     <aura:attribute name="pageSize"            type="Integer"          access="public" default="50" />
     <aura:attribute name="height"              type="Integer"          access="public" default="500" />
     <aura:attribute name="errorMessage"        type="String"  access="public" default=""/>  
+    
+    
+    
     
     <!-- Private Attributes -->
     <aura:attribute name="fields"          type="Object[]" access="public" default="[]" />
@@ -30,6 +33,11 @@
     <!-- Event Handler -->   
     <aura:handler event="c:RecordHunterEvent" action="{!c.onRecordHunterEvent}"/>
     <aura:handler name="init" value="{!this}" action="{!c.valueInit}" />
+
+    <aura:handler event="c:RecordHunter_FlowModalEvent" name="finished" action="{!c.onFlowModalFinished}"/>
+    
+     <!-- Modal -->   
+    <c:RecordHunter_FlowModal aura:id="flowModal" />
     
     <!-- User Interface -->   
     <div aura:id="component">
@@ -53,6 +61,7 @@
                         </aura:iteration>
                     </lightning:buttonMenu>
                 </aura:if>
+
             </aura:set>
             <!-- /Card Actions -->            
 
@@ -81,19 +90,6 @@
             
         </lightning:card>
         
-        <!-- Modal Section -->
-        <div class="{!if(empty(v.modalBody), 'is-hidden', '')}">
-            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
-                <div class="slds-modal__container">
-                    <header class="slds-modal__header slds-modal__header_empty">
-                        <lightning:buttonIcon iconName="utility:close" alternativeText="Close" size="large" variant="bare-inverse" class="slds-modal__close" onclick="{!c.onFlowClosed}"/>
-                    </header>
-                    {!v.modalBody}
-                </div>
-            </section>
-            <div class="slds-backdrop slds-backdrop_open"></div>
-        </div>
-        <!-- /Modal Section -->
         
     </div>
 </aura:component>

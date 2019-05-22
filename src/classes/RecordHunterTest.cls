@@ -15,4 +15,12 @@ public class RecordHunterTest {
         RecordHunterField.testskipper();
         Test.stopTest();
     }
+    
+    static testMethod void runRecordHunterFlowModalTestSkipper() {
+        Test.startTest();
+        RecordHunterFlowModalController.testskipper();
+        Test.stopTest();
+    }
+    
+    
 }

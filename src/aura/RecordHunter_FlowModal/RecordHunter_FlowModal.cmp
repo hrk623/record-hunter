@@ -1,0 +1,32 @@
+<aura:component access="public" controller="RecordHunterFlowModalController">
+
+    <!-- Registered Events -->
+    <aura:registerEvent type="c:RecordHunter_FlowModalEvent" name="finished" />
+    
+    <!-- Component Methods -->
+    <aura:method name="startFlowWithRecordIds" action="{!c.onStartFlowWithRecordIds}">
+        <aura:attribute type="String" name="flowName" default=""/>
+        <aura:attribute type="List"   name="recordIds" default="[]"/>
+        <aura:attribute type="String" name="recordId" default=""/>
+    </aura:method>
+    <aura:method name="startFlowWithRecords" action="{!c.onStartFlowWithRecords}">
+        <aura:attribute type="String" name="flowName" default=""/>
+        <aura:attribute type="List"   name="recordIds" default="[]"/>
+        <aura:attribute type="String" name="recordId" default=""/>
+    </aura:method>    
+    
+    
+    <!-- User Interface -->
+    <div class="{!if(empty(v.body), 'slds-hide', '')}">
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header slds-modal__header_empty">
+                    <lightning:buttonIcon iconName="utility:close" alternativeText="Close" size="large" variant="bare-inverse" class="slds-modal__close" onclick="{!c.onFlowClosed}"/>
+                </header>
+                {!v.body}
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+    
+</aura:component>

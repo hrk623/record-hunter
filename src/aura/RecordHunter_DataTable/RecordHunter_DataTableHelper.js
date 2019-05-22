@@ -80,8 +80,8 @@
                         if (record[key] === true) record[key] = c.get('v.true');
                         if (record[key] === false) record[key] = c.get('v.false');
                     } else if (types[key] === "TIME") {
+                        if (record[key]) record[key] = moment.utc("1970-01-01 "+record[key]).format('HH:mm');
                         console.log(record[key]);
-                        if (record[key]) record[key] = moment.utc("1970-01-01 "+record[key]).format('hh:mm');
                     } else if (types[key] === "PERCENT") {
                         if (record[key]) record[key] = record[key]/100.0;
                     }
@@ -169,23 +169,6 @@
         });
         event.fire();
     },
-    startFlow : function(c, h, flowName, inputVariables) {
-        $A.createComponent(
-            "lightning:flow", {
-                'aura:id': 'flow',
-                'onstatuschange': c.getReference('c.onFlowStatusChanged')
-            }, function(flow, status, errorMessage){
-                if (status === "SUCCESS") {
-                    c.set('v.flowComponents', [flow]);
-                    flow.startFlow(flowName, inputVariables);
-                } else if (status === "INCOMPLETE") {
-                    h.showError(c, h, 'controller.startFlow : No response from server or client is offline.');
-                } else if (status === "ERROR") {
-                    h.showError(c, h, 'controller.startFlow : ' + errorMessage);
-                }
-            }
-        );
-    },
     flatten : function(c, h, data, objectName) {
         var result = {};
         function recurse (cur, prop) {
@@ -245,20 +228,6 @@
             }
         });
         return data;
-    },
-    initFlowComponent : function(c, h) {
-        const name = 'lightning:flow';
-        const attributes = {
-            'aura:id': 'flow',
-            'onstatuschange': c.getReference('c.onFlowStatusChanged')
-        };
-        return new Promise(function (resolve, reject) {            
-            $A.createComponent(name, attributes, function(cmp, status, error) {
-                if (status === "SUCCESS") resolve(cmp);
-                else if (status === "INCOMPLETE") reject('No response from server or client is offline.');
-                else if (status === "ERROR") reject(error);
-            });
-        });
     },
     getFields : function(c, h, objectName, fieldNames) {
         const action = c.get('c.getFields');

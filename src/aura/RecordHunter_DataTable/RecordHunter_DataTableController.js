@@ -4,8 +4,6 @@
         h.initColumns(c, h);
     },
     onRecordHunterEvent : function(c, e, h) {
-        console.log("onRecordHunterEvent");
-
         c.find("dataTable").set("v.enableInfiniteLoading", true);
         c.set("v.offset", 0);
         c.set("v.recordIds", e.getParam('recordIds'));
@@ -50,40 +48,21 @@
             prev.push(row[c.get('v.objectName').toLowerCase() + '.id' ]);
             return prev;
         }, []); 
-        h.initFlowComponent(c, h)
-        .then($A.getCallback(function(flowComponent) {
-            c.set('v.modalBody', [flowComponent]);
-            flowComponent.startFlow(e.getParam('value'), [{ 
-                name : 'contextId', 
-                type : 'String',
-                value: c.get('v.recordId') 
-            }, { 
-                name : 'selectedIds', 
-                type : 'String', 
-                value: selectedIds 
-            }]);
-        }))
-        .catch(function(reason) {
-            h.showError(c, h, "controller.onFlowSelected : " + reason);
-        });   
-    },
-    onFlowStatusChanged : function (c, e, h) {
-        switch(e.getParam('status')) {
-            case 'FINISHED':
-                c.set('v.modalBody', []);
-                c.find("dataTable").set("v.enableInfiniteLoading", true);
-                c.set("v.offset", 0);
-                c.set('v.data', []);
-                h.loadData(c, h);
-                break;
-            case 'FINISHED_SCREEN':
-            case 'STARTED':
-            case 'PAUSED':
-            case 'ERROR':
-                break;
+        
+        const flowParamterType = c.get('v.flowParameters');
+        if (flowParamterType === 'Record IDs') {
+             c.find('flowModal').startFlowWithRecordIds(e.getParam('value'), selectedIds, c.get('v.recordId'));
+        } else {
+             c.find('flowModal').startFlowWithRecords(e.getParam('value'), selectedIds, c.get('v.recordId'));
         }
     },
-    onFlowClosed : function (c, e, h) {
-        c.set('v.modalBody', []);
-    },    
+    onFlowModalFinished : function (c, e, h) {
+        c.find("dataTable").set("v.enableInfiniteLoading", true);
+        c.set("v.offset", 0);
+        c.set('v.data', []);
+        h.loadData(c, h);
+    },  
+    onDetail: function (c, e, h) {
+       console.log("onDetail");
+    },  
 })

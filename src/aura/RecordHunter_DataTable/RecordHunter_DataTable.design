@@ -8,6 +8,8 @@
     <design:attribute name="false"      label="Label for False" required="true" default="false" description="Label for chechbox value if 'false'"/>
     <design:attribute name="flowNames"  label="Flow Names"      required="false" description="API Name of Flows available for selected records. Flows require an input variable 'contextId' and a collection variable 'selectedIds'. Use ','' for multiple flows."/>
     <design:attribute name="flowLabels" label="Flow Labels"     required="false" description="Labels for Flows to overwrite the Flows' API Names. Use ','' for multiple flows."/>
+    <design:attribute name="flowParameters" label="Flow Parameter Type" required="false" default="Record IDs" datasource="Record IDs, Records" description="Labels for Flows to overwrite the Flows' API Names. Use ','' for multiple flows."/>
+
     <design:attribute name="messageWhenNoResult" label="Message When No Result Found" required="false" default="No Records Found" description="Message to display when no records are found"/>
     
 </design:component>

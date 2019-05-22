@@ -4,6 +4,7 @@
     <types>
         <members>RecordHunterController</members>
         <members>RecordHunterField</members>
+        <members>RecordHunterFlowModalController</members>
         <members>RecordHunterLexer</members>
         <members>RecordHunterTest</members>
         <name>ApexClass</name>
@@ -15,6 +16,8 @@
     <types>
         <members>RecordHunterEvent</members>
         <members>RecordHunter_DataTable</members>
+        <members>RecordHunter_FlowModal</members>
+        <members>RecordHunter_FlowModalEvent</members>
         <members>RecordHunter_LocationFilter</members>
         <members>RecordHunter_MultiSelect</members>
         <members>RecordHunter_SearchBox</members>
@@ -25,5 +28,5 @@
         <members>RecordHunterLib</members>
         <name>StaticResource</name>
     </types>
-    <version>43.0</version>
+    <version>45.0</version>
 </Package>
