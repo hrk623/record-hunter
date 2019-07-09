@@ -1,3 +1,15 @@
+# CAITION!!
+
+This repository is closed and is no longer going tobe updated.
+Please refer to this repository for futher updates.
+
+https://github.com/hrk623/record-hunter-sfdx
+
+
+
+
+
+
 # Record Hunter
 A lightning component bundle for searching records on salesforce platform.
 
