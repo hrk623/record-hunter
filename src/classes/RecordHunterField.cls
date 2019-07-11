@@ -50,6 +50,7 @@ public class RecordHunterField {
         if (pathComponents.size() < 2) throw new RecordHunterFieldException('path \'' + path + '\' is not a valid path.');
         
         List<String> queryPathComponents = new List<String>();
+        List<String> relationshipLabelComponents = new List<String>();
         while (true) {
             String objectName = pathComponents[0];
             String fieldName = pathComponents[1].substringBefore(':');
@@ -61,14 +62,17 @@ public class RecordHunterField {
             if (queryPathComponents.isEmpty()) queryPathComponents.add(objectName);
             
             if (pathComponents.size() == 2) {
-                init(objectName, fieldName, String.join(queryPathComponents, '.') + '.' + fieldName);
+                init(objectName, fieldName, String.join(queryPathComponents, '.') + '.' + fieldName, String.join(relationshipLabelComponents, '.'));
                 break;
             } else {
                 if (!isValidReferenceFieldName(objectName, fieldName)) throw new RecordHunterFieldException('RecordHunterField.RecordHunterField : \''+fieldName + '\' of \'' + objectName + '\' is not a reference field.');
                 
-                // Build query path components
-                String relationshipName = getRelationshipName(objectName, fieldName);
+                // Build query path components and relationship label
+                Schema.DescribeFieldResult relationship = getRelationship(objectName, fieldName);
+                String relationshipName = relationship.getRelationshipName();
+                String relationshipLabel = relationship.getLabel();
                 queryPathComponents.add(relationshipName);
+                relationshipLabelComponents.add(relationshipLabel);
                 
                 // Reduce path components
                 pathComponents.remove(0);
@@ -131,11 +135,11 @@ public class RecordHunterField {
         else return String.isNotEmpty(this.value);
     }
     
-    private void init(String objectName, String fieldName, String path) {
+    private void init(String objectName, String fieldName, String path, String relationshipLabel) {
         this.objectName = getObjectName(objectName);
         this.objectLabel = getObjectLabel(objectName);
         this.name = getFieldName(objectName, fieldName);
-        this.Label = getFieldLabel(objectName, fieldName);
+        this.Label = (relationshipLabel.length() > 0 ? relationshipLabel + '.' : '') + getFieldLabel(objectName, fieldName);
         this.type = getFieldType(objectName, fieldName).name();
         this.isNameField = isNameField(objectName, fieldName);
         this.path = path.toLowerCase();
@@ -204,8 +208,8 @@ public class RecordHunterField {
         }
         return ret;
     }
-    private String getRelationshipName(String objectName, String fieldName){
-        return Schema.getGlobalDescribe().get(objectName).getDescribe().fields.getMap().get(fieldName).getDescribe().getRelationshipName();
+    private Schema.DescribeFieldResult getRelationship(String objectName, String fieldName){
+        return Schema.getGlobalDescribe().get(objectName).getDescribe().fields.getMap().get(fieldName).getDescribe();
     }
     private Boolean isValidObjectName(String objectName){ 
         return !String.isEmpty(objectName) && Schema.getGlobalDescribe().containsKey(objectName);
