@@ -60,7 +60,7 @@
 
         c.find("dataTable").set("v.isLoading", true);
         
-        h.getRecords(c, h, c.get('v.objectName'), JSON.stringify(c.get('v.fields')), JSON.stringify(recordIds.slice(offset, offset + loadSize)))
+        h.getRecords(c, h, c.get('v.objectName'), JSON.stringify(c.get('v.fields')), JSON.stringify(recordIds.slice(offset, offset + loadSize)), c.get('v.sortedBy'), c.get('v.sortedDirection'))
         .then($A.getCallback(function (records) {
             records.forEach(function(record, index){
                 record = h.flatten(c, h, record, c.get('v.objectName'));
@@ -275,12 +275,14 @@
             $A.enqueueAction(action);
         });
     },
-    getRecords : function(c, h, objectName, fieldsJson, recordIdsJson) {
+    getRecords : function(c, h, objectName, fieldsJson, recordIdsJson, sortedBy, sortedDirection) {
         const action = c.get('c.getRecords');
         action.setParams({
             objectName: objectName,
             fieldsJson: fieldsJson,
-            recordIdsJson: recordIdsJson
+            recordIdsJson: recordIdsJson,
+            sortedBy: sortedBy,
+            sortedDirection: sortedDirection
         });
         return new Promise(function (resolve, reject) {
             action.setCallback(this, function(response) {
@@ -300,6 +302,24 @@
             duration: 3000
         });
         toastEvent.fire();
+    },
+    getSortIds : function(c, h) {
+        const sortedBy = c.get('v.sortedBy');
+        const action = c.get('c.getSortedIds');
+        action.setParams({
+            objectName: c.get('v.objectName'),
+            recordIdsJson: JSON.stringify(c.get('v.recordIds')),
+            sortedBy: sortedBy,
+            sortedDirection: c.get('v.sortedDirection')
+        });
+        return new Promise(function (resolve, reject) {
+            action.setCallback(this, function(response) {
+                const ret = JSON.parse(response.getReturnValue());
+                if (response.getState() === 'SUCCESS') ret.hasError ? reject(ret.message) : resolve(ret);
+                else if (response.getState() === 'ERROR') reject(response.getError());
+            });
+            $A.enqueueAction(action);
+        });
     },
     showError : function(c, h, message) {
         const isOnAppBuilder = document.location.href.toLowerCase().indexOf('flexipageeditor') >= 0;
